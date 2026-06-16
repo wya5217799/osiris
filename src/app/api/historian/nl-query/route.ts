@@ -27,8 +27,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const data = await upstream.json(); // 上游异常时为 HTTP 500 {detail:...}
     return NextResponse.json(data, { status: upstream.status, headers: NO_STORE });
   } catch (err: unknown) {
+    console.error('[historian-bff] /nl-query 代理失败:', err);
     return NextResponse.json(
-      { error: 'NL 服务不可用', detail: err instanceof Error ? err.message : 'unknown', rows: [] },
+      { error: 'NL 服务不可用', rows: [] },
       { status: 502, headers: NO_STORE },
     );
   }

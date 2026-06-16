@@ -918,7 +918,7 @@ export default function Dashboard() {
 
         {/* ── 中文情报面板组（烽火 Fanos，新增；详见 docs/adr/0007） ── */}
         <div className="w-6 border-t border-white/10 mx-auto" />
-        <ChinesePanels onLocate={(lat, lng) => setFlyToLocation({ lat, lng, ts: Date.now() })} />
+        <ChinesePanels />
 
         {/* Self Track — IP Geolocation */}
         <div className="w-6 border-t border-white/10 mx-auto" />

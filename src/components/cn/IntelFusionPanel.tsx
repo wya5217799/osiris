@@ -17,11 +17,7 @@ interface HistorianItem {
 }
 type ItemsResp = { items: HistorianItem[] } | { error: string; items: HistorianItem[] };
 
-interface Props {
-  onLocate?: (lat: number, lng: number) => void;
-}
-
-export default function IntelFusionPanel({ onLocate: _onLocate }: Props) {
+export default function IntelFusionPanel() {
   const [items, setItems] = useState<HistorianItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

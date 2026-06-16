@@ -15,17 +15,13 @@ import HistoryQueryPanel from '@/components/cn/HistoryQueryPanel';
 
 type Panel = 'fusion' | 'alerts' | 'history';
 
-interface Props {
-  onLocate?: (lat: number, lng: number) => void;
-}
-
 const BUTTONS: { key: Panel; Icon: typeof Newspaper; label: string; activeColor: string }[] = [
   { key: 'fusion', Icon: Newspaper, label: '融合情报条目', activeColor: 'text-[var(--gold-primary)]' },
   { key: 'alerts', Icon: AlertTriangle, label: '哨兵告警', activeColor: 'text-[var(--alert-red)]' },
   { key: 'history', Icon: Brain, label: '问历史', activeColor: 'text-[var(--cyan-primary)]' },
 ];
 
-export default function ChinesePanels({ onLocate }: Props) {
+export default function ChinesePanels() {
   const [active, setActive] = useState<Panel | null>(null);
 
   return (
@@ -53,9 +49,9 @@ export default function ChinesePanels({ onLocate }: Props) {
             exit={{ opacity: 0, x: 20 }}
             className="absolute right-12 top-1/2 -translate-y-1/2 w-80"
           >
-            {active === 'fusion' && <IntelFusionPanel onLocate={onLocate} />}
-            {active === 'alerts' && <SentinelAlertsPanel onLocate={onLocate} />}
-            {active === 'history' && <HistoryQueryPanel onLocate={onLocate} />}
+            {active === 'fusion' && <IntelFusionPanel />}
+            {active === 'alerts' && <SentinelAlertsPanel />}
+            {active === 'history' && <HistoryQueryPanel />}
           </motion.div>
         )}
       </AnimatePresence>

@@ -19,7 +19,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   }
   // ★ historian 对 limit>500 返回 HTTP 422（不是截断）。必须夹到 ≤500
   const rawLimit = Number(sp.get('limit') ?? 50);
-  forward.set('limit', String(Math.min(Number.isFinite(rawLimit) ? rawLimit : 50, 500)));
+  // 夹下界+上界并截整：挡掉负数(→PG LIMIT -5 报错)、0(→静默空)、小数(→FastAPI 422)
+  const limit = Math.min(Math.max(Math.trunc(Number.isFinite(rawLimit) ? rawLimit : 50), 1), 500);
+  forward.set('limit', String(limit));
 
   try {
     const upstream = await fetch(`${HISTORIAN_URL}/items?${forward.toString()}`, {
@@ -31,8 +33,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const data = await upstream.json();
     return NextResponse.json(data, { status: upstream.status, headers: NO_STORE });
   } catch (err: unknown) {
+    console.error('[historian-bff] /items 代理失败:', err); // 真实错误只留服务端
     return NextResponse.json(
-      { error: 'historian unreachable', detail: err instanceof Error ? err.message : 'unknown', items: [] },
+      { error: 'historian 服务不可达', items: [] }, // 对外稳定中文文案，不泄露内网细节
       { status: 502, headers: NO_STORE },
     );
   }

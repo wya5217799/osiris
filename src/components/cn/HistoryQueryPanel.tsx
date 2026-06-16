@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Brain, Send, Loader2 } from 'lucide-react'; // 均已确认存在（AiAnalyst 用过）
 
@@ -10,24 +10,26 @@ interface NlResult {
   rows: Array<Array<string | number | boolean | null>>;
   answer_zh: string;
 }
-
-interface Props {
-  onLocate?: (lat: number, lng: number) => void;
-}
+// 失败形态：空问题→HTTP 200 + {error}；上游异常（缺 key/SQL 被拒/PG 错）→HTTP 500 + {detail}
+type NlResp = NlResult | { error: string; rows: [] } | { detail: string };
 
 const SUGGESTIONS = ['数据库里有几条情报条目？', '最近的高分情报是什么？', '一共有哪些来源类型？'];
 
-export default function HistoryQueryPanel(_props: Props) {
+export default function HistoryQueryPanel() {
   const [q, setQ] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<NlResult | null>(null);
   const [showSql, setShowSql] = useState(false);
+  const ctrlRef = useRef<AbortController | null>(null);
 
   const ask = useCallback(
     async (question: string) => {
       const text = question.trim();
       if (!text || loading) return;
+      ctrlRef.current?.abort(); // 取消上一次仍在飞的查询
+      const ctrl = new AbortController();
+      ctrlRef.current = ctrl;
       setLoading(true);
       setError(null);
       try {
@@ -35,21 +37,29 @@ export default function HistoryQueryPanel(_props: Props) {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           cache: 'no-store',
+          signal: ctrl.signal,
           body: JSON.stringify({ question: text }),
         });
-        const json = await res.json();
-        if (!res.ok) throw new Error(json?.error || json?.detail || `HTTP ${res.status}`);
-        // 成功判据：body 含 sql（空问题是 200+error，上游异常是 500+detail）
-        if (!('sql' in json)) throw new Error(json?.error || json?.detail || 'NL 服务返回异常');
-        setResult(json as NlResult);
+        const json: NlResp = await res.json();
+        if (!res.ok) {
+          const msg = 'error' in json && json.error ? json.error : 'detail' in json && json.detail ? json.detail : `HTTP ${res.status}`;
+          throw new Error(msg);
+        }
+        // 成功判据：body 含 sql（空问题是 200+error）
+        if (!('sql' in json)) throw new Error('error' in json && json.error ? json.error : 'NL 服务返回异常');
+        setResult(json);
       } catch (err: unknown) {
+        if (err instanceof DOMException && err.name === 'AbortError') return; // 卸载/重入忽略
         setError(err instanceof Error ? err.message : '查询失败');
       } finally {
-        setLoading(false);
+        if (ctrlRef.current === ctrl) setLoading(false);
       }
     },
     [loading],
   );
+
+  // 收起面板（卸载）时取消在飞的 DeepSeek 查询，省掉白跑
+  useEffect(() => () => ctrlRef.current?.abort(), []);
 
   return (
     <motion.div

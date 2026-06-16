@@ -15,10 +15,6 @@ interface HistorianAlert {
 }
 type AlertsResp = { alerts: HistorianAlert[] } | { error: string; alerts: HistorianAlert[] };
 
-interface Props {
-  onLocate?: (lat: number, lng: number) => void;
-}
-
 // severity 是自由文本：大小写无关地映射颜色，未知归默认（不做 exhaustive 渲染）
 function sevColor(sev: string): string {
   const s = (sev || '').toLowerCase();
@@ -27,7 +23,7 @@ function sevColor(sev: string): string {
   return 'var(--text-muted)';
 }
 
-export default function SentinelAlertsPanel({ onLocate: _onLocate }: Props) {
+export default function SentinelAlertsPanel() {
   const [alerts, setAlerts] = useState<HistorianAlert[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
