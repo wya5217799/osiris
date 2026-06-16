@@ -56,6 +56,20 @@ export default function SentinelAlertsPanel() {
     };
   }, [load]);
 
+  // 实时推送：SSE 订阅 /alerts/stream，哨兵发新告警即时刷新（上面的 30s 轮询保留为兜底）。
+  // EventSource 原生自动重连：断网 / historian 重启后自动恢复，无需手动处理。
+  useEffect(() => {
+    const es = new EventSource('/api/historian/alerts/stream');
+    const ctrl = new AbortController();
+    const onAlert = () => load(ctrl.signal); // SSE 只当“变更信号”，full alert 仍走现成 load
+    es.addEventListener('alert', onAlert);
+    return () => {
+      es.removeEventListener('alert', onAlert);
+      es.close();
+      ctrl.abort();
+    };
+  }, [load]);
+
   return (
     <motion.div
       data-testid="alerts-panel"
