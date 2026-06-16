@@ -15,6 +15,7 @@ import ViewPresets from '@/components/ViewPresets';
 import KeyboardShortcuts from '@/components/KeyboardShortcuts';
 import GlobalStatusBar from '@/components/GlobalStatusBar';
 import LiveAlerts from '@/components/LiveAlerts';
+import ChinesePanels from '@/components/ChinesePanels';
 
 const OsirisMap = dynamic(() => import('@/components/OsirisMap'), { ssr: false });
 const LayerPanel = dynamic(() => import('@/components/LayerPanel'));
@@ -914,6 +915,10 @@ export default function Dashboard() {
             <Network className={`w-4 h-4 ${showEntityGraph ? 'text-[#D4AF37]' : 'text-white/60'}`} />
           </button>
         </div>
+
+        {/* ── 中文情报面板组（烽火 Fanos，新增；详见 docs/adr/0007） ── */}
+        <div className="w-6 border-t border-white/10 mx-auto" />
+        <ChinesePanels onLocate={(lat, lng) => setFlyToLocation({ lat, lng, ts: Date.now() })} />
 
         {/* Self Track — IP Geolocation */}
         <div className="w-6 border-t border-white/10 mx-auto" />
