@@ -2,9 +2,9 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 const SITE_URL = "https://osirisai.live";
-const SITE_NAME = "OSIRIS";
-const SITE_TITLE = "OSIRIS — Open Source Intelligence Platform | Live Flight Tracking, CCTV, OSINT Tools & More";
-const SITE_DESCRIPTION = "The open-source Palantir alternative. Track 10,000+ aircraft, 2,000 satellites, and worldwide CCTV cameras in real-time on a 3D globe. Run Nmap scans, DNS lookups, WHOIS queries, SSL cert analysis & threat intelligence — all from your browser. 20+ live data feeds including earthquakes, wildfires, nuclear facilities, cyber threats, and global conflicts. Free & open source.";
+const SITE_NAME = "烽火 Fanos";
+const SITE_TITLE = "烽火 Fanos — 个人情报 / 预警平台｜实时航班、海事、地缘事件与 OSINT 工具";
+const SITE_DESCRIPTION = "基于开源 Osiris 改造的个人情报 / 预警平台。在 3D 地球上实时追踪航班、船舶、卫星与全球摄像头；从浏览器运行 Nmap、DNS、WHOIS、SSL 证书分析与威胁情报等 OSINT 工具；汇聚地震、火灾、核设施、网络威胁、地缘冲突等 20+ 实时数据源。";
 
 export const viewport: Viewport = {
   themeColor: "#D4AF37",
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default: SITE_TITLE,
-    template: "%s | OSIRIS Intelligence",
+    template: "%s | 烽火 Fanos",
   },
   description: SITE_DESCRIPTION,
   keywords: [
@@ -90,11 +90,11 @@ export const metadata: Metadata = {
     canonical: SITE_URL,
   },
   openGraph: {
-    title: "OSIRIS — The Open-Source Palantir Alternative | Live Flights, CCTV, Satellites & OSINT Tools",
-    description: "Track 10K+ aircraft, 2K satellites & worldwide CCTV on a 3D globe. Run Nmap, DNS, WHOIS & threat intel scans from your browser. 20+ live intelligence feeds. Free. Open source.",
+    title: "烽火 Fanos — 个人情报 / 预警平台｜实时航班、CCTV、卫星与 OSINT 工具",
+    description: "在 3D 地球上实时追踪 1 万+ 航班、卫星与全球 CCTV；从浏览器运行 Nmap、DNS、WHOIS 与威胁情报扫描；20+ 实时情报源。",
     type: "website",
     siteName: SITE_NAME,
-    locale: "en_US",
+    locale: "zh_CN",
     url: SITE_URL,
     images: [
       {
@@ -108,8 +108,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "🛰️ OSIRIS — Open Source Palantir Alternative | Live Tracking + OSINT Tools",
-    description: "Track 10K+ flights, satellites & CCTV worldwide. Run Nmap, DNS, WHOIS scans from your browser. 20+ live intel feeds. Free & open source.",
+    title: "🛰️ 烽火 Fanos — 个人情报 / 预警平台｜实时追踪 + OSINT 工具",
+    description: "在 3D 地球上实时追踪全球航班、卫星与 CCTV；从浏览器运行 Nmap、DNS、WHOIS 扫描；20+ 实时情报源。",
     creator: "@simplifaisoul",
     site: "@simplifaisoul",
     images: [`${SITE_URL}/og-image.png`],
@@ -181,7 +181,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" dir="ltr">
+    <html lang="zh-CN" dir="ltr">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

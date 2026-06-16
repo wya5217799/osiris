@@ -31,77 +31,77 @@ const getLayerGroups = (theme: 'core' | 'ghost') => {
   return [
   {
     label: 'SDK',
-    fullLabel: 'OSIRIS SDK',
+    fullLabel: '烽火 SDK',
     color: '#1565C0',
     layers: [
-      { key: 'sdk_sea', label: 'Maritime Lines', icon: Anchor, color: '#4FC3F7', dataKey: 'sdk_entities' },
-      { key: 'sdk_ransomware', label: 'Ransomware Feed', icon: AlertTriangle, color: '#D32F2F', dataKey: 'sdk_entities' },
+      { key: 'sdk_sea', label: '海运航线', icon: Anchor, color: '#4FC3F7', dataKey: 'sdk_entities' },
+      { key: 'sdk_ransomware', label: '勒索软件源', icon: AlertTriangle, color: '#D32F2F', dataKey: 'sdk_entities' },
     ],
   },
   {
-    label: 'AVIATION',
-    fullLabel: 'AVIATION',
+    label: '航空',
+    fullLabel: '航空',
     color: flightCom,
     layers: [
-      { key: 'flights', label: 'Commercial', icon: Plane, color: flightCom, dataKey: 'commercial_flights' },
-      { key: 'private', label: 'Private', icon: Plane, color: flightPriv, dataKey: 'private_flights' },
-      { key: 'jets', label: 'Private Jets', icon: Plane, color: flightGov, dataKey: 'private_jets' },
-      { key: 'military', label: 'Military', icon: Shield, color: flightMil, dataKey: 'military_flights' },
+      { key: 'flights', label: '商用航班', icon: Plane, color: flightCom, dataKey: 'commercial_flights' },
+      { key: 'private', label: '私人航班', icon: Plane, color: flightPriv, dataKey: 'private_flights' },
+      { key: 'jets', label: '私人喷气机', icon: Plane, color: flightGov, dataKey: 'private_jets' },
+      { key: 'military', label: '军用航班', icon: Shield, color: flightMil, dataKey: 'military_flights' },
     ],
   },
   {
-    label: 'MARITIME',
-    fullLabel: 'MARITIME & SPACE',
+    label: '海事',
+    fullLabel: '海事与太空',
     color: '#26C6DA',
     layers: [
-      { key: 'maritime', label: 'Maritime / Naval', icon: Ship, color: '#26C6DA', dataKey: 'maritime_ships,maritime_ports,maritime_chokepoints' },
-      { key: 'satellites', label: 'Satellites', icon: Satellite, color: '#D4AF37', dataKey: 'satellites' },
+      { key: 'maritime', label: '海事 / 海军', icon: Ship, color: '#26C6DA', dataKey: 'maritime_ships,maritime_ports,maritime_chokepoints' },
+      { key: 'satellites', label: '卫星', icon: Satellite, color: '#D4AF37', dataKey: 'satellites' },
     ],
   },
   {
-    label: 'SURVEIL',
-    fullLabel: 'SURVEILLANCE',
+    label: '监控',
+    fullLabel: '监控',
     color: '#7E57C2',
     layers: [
-      { key: 'cctv', label: 'CCTV Cameras', icon: Camera, color: '#7E57C2', dataKey: 'cameras' },
-      { key: 'live_news', label: 'Live News Feeds', icon: Tv, color: '#EC407A', dataKey: 'live_feeds' },
+      { key: 'cctv', label: '监控摄像头', icon: Camera, color: '#7E57C2', dataKey: 'cameras' },
+      { key: 'live_news', label: '实时新闻源', icon: Tv, color: '#EC407A', dataKey: 'live_feeds' },
     ],
   },
   {
-    label: 'HAZARD',
-    fullLabel: 'NATURAL HAZARDS',
+    label: '灾害',
+    fullLabel: '自然灾害',
     color: '#F9A825',
     layers: [
-      { key: 'earthquakes', label: 'Earthquakes (24h)', icon: Activity, color: '#F9A825', dataKey: 'earthquakes' },
-      { key: 'fires', label: 'Active Fires', icon: Flame, color: '#E65100', dataKey: 'fires' },
-      { key: 'weather', label: 'Severe Weather', icon: CloudLightning, color: '#7E57C2', dataKey: 'weather_events' },
+      { key: 'earthquakes', label: '地震（24小时）', icon: Activity, color: '#F9A825', dataKey: 'earthquakes' },
+      { key: 'fires', label: '活跃火点', icon: Flame, color: '#E65100', dataKey: 'fires' },
+      { key: 'weather', label: '恶劣天气', icon: CloudLightning, color: '#7E57C2', dataKey: 'weather_events' },
     ],
   },
   {
-    label: 'THREAT',
-    fullLabel: 'THREATS & INFRA',
+    label: '威胁',
+    fullLabel: '威胁与基础设施',
     color: '#D32F2F',
     layers: [
-      { key: 'infrastructure', label: 'Nuclear Facilities', icon: Radiation, color: '#26A69A', dataKey: 'infrastructure' },
-      { key: 'global_incidents', label: 'Global Incidents', icon: AlertTriangle, color: '#D32F2F', dataKey: 'gdelt' },
-      { key: 'gps_jamming', label: 'GPS Jamming', icon: Radio, color: '#D32F2F', dataKey: 'gps_jamming' },
+      { key: 'infrastructure', label: '核设施', icon: Radiation, color: '#26A69A', dataKey: 'infrastructure' },
+      { key: 'global_incidents', label: '全球事件', icon: AlertTriangle, color: '#D32F2F', dataKey: 'gdelt' },
+      { key: 'gps_jamming', label: 'GPS 干扰', icon: Radio, color: '#D32F2F', dataKey: 'gps_jamming' },
     ],
   },
   {
-    label: 'NETWORK',
-    fullLabel: 'NETWORK INTEL',
+    label: '网络',
+    fullLabel: '网络情报',
     color: '#D32F2F',
     layers: [
 
-      { key: 'malware', label: 'Live Malware', icon: AlertTriangle, color: '#D32F2F', dataKey: 'malware_threats' },
+      { key: 'malware', label: '实时恶意软件', icon: AlertTriangle, color: '#D32F2F', dataKey: 'malware_threats' },
     ],
   },
   {
-    label: 'DISPLAY',
-    fullLabel: 'DISPLAY',
+    label: '显示',
+    fullLabel: '显示',
     color: '#448AFF',
     layers: [
-      { key: 'day_night', label: 'Day / Night Cycle', icon: Sun, color: '#448AFF', dataKey: '' },
+      { key: 'day_night', label: '昼夜循环', icon: Sun, color: '#448AFF', dataKey: '' },
     ],
   },
   ];
@@ -158,7 +158,7 @@ function LayerPanel({ data, activeLayers, setActiveLayers, isMobile, theme = 'co
                     key={layer.key}
                     onClick={() => {
                       if (layer.key === 'sdk_ransomware') {
-                        alert('Ransomware Feed - Coming Soon');
+                        alert('勒索软件源 — 即将推出');
                       } else {
                         toggle(layer.key);
                       }
@@ -194,7 +194,7 @@ function LayerPanel({ data, activeLayers, setActiveLayers, isMobile, theme = 'co
         {setTheme && (
           <div className="flex items-center justify-between mt-4 pt-4 border-t border-[var(--border-primary)] px-2">
             <div className="text-[10px] font-bold font-mono tracking-widest text-[var(--text-secondary)]">
-              GHOST MODE
+              幽灵模式
             </div>
             <button
               onClick={() => setTheme(theme === 'core' ? 'ghost' : 'core')}
@@ -293,7 +293,7 @@ function LayerPanel({ data, activeLayers, setActiveLayers, isMobile, theme = 'co
                             key={layer.key}
                             onClick={() => {
                               if (layer.key === 'sdk_ransomware') {
-                                alert('Ransomware Feed - Coming Soon');
+                                alert('勒索软件源 — 即将推出');
                               } else {
                                 toggle(layer.key);
                               }
@@ -327,7 +327,7 @@ function LayerPanel({ data, activeLayers, setActiveLayers, isMobile, theme = 'co
       {/* DESKTOP THEME TOGGLE */}
       {setTheme && (
         <div className="mt-auto px-2 pt-6 pb-2 border-t border-[var(--border-primary)] flex flex-col items-center gap-3 relative z-50">
-          <div className="text-[9px] font-mono tracking-[0.25em] text-[var(--text-secondary)]">GHOST PROTOCOL</div>
+          <div className="text-[9px] font-mono tracking-[0.25em] text-[var(--text-secondary)]">幽灵协议</div>
           <button
             onClick={() => setTheme(theme === 'core' ? 'ghost' : 'core')}
             className="relative w-14 h-7 rounded-full transition-all duration-500 ease-in-out border flex items-center px-1 cursor-pointer hover:shadow-lg"

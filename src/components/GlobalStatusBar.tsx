@@ -2,16 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { t } from '@/lib/i18n';
 
 interface Exchange { name: string; country: string; open: boolean; }
 interface CountryRisk { code: string; risk_score: number; risk_level: string; tags: string[]; }
-
-const RISK_TOOLTIPS: Record<string, string> = {
-  CRITICAL: 'Active conflict, sanctions, or major instability detected',
-  HIGH: 'Elevated threat level — ongoing tensions or security concerns',
-  ELEVATED: 'Moderate risk — political instability or regional disputes',
-  LOW: 'Stable — no significant threats detected',
-};
 
 export default function GlobalStatusBar() {
   const [exchanges, setExchanges] = useState<Exchange[]>([]);
@@ -79,8 +73,8 @@ export default function GlobalStatusBar() {
       ))}
       <span className="text-[var(--border-primary)] mx-1">|</span>
       <span className="inline-flex items-center gap-1 mx-2">
-        <span className="text-[#E040FB]">CYBER</span>
-        <span className="text-[var(--text-primary)]">{cveCount} CVEs</span>
+        <span className="text-[#E040FB]">{t('statusBar.cyber')}</span>
+        <span className="text-[var(--text-primary)]">{cveCount} {t('statusBar.cves')}</span>
       </span>
     </>
   );
@@ -98,7 +92,7 @@ export default function GlobalStatusBar() {
         
         {/* Static label */}
         <div className="flex-shrink-0 px-3 h-full flex items-center gap-1 border-r border-[var(--cyan-primary)]/30 bg-black pointer-events-auto relative z-10 shadow-[4px_0_10px_rgba(0,0,0,0.5)]">
-          <span className="text-[var(--cyan-primary)]/50">MKT</span>
+          <span className="text-[var(--cyan-primary)]/50">{t('statusBar.mkt')}</span>
           <span className="text-[var(--cyan-primary)] font-bold">{openCount}/{exchanges.length}</span>
         </div>
 
@@ -120,12 +114,12 @@ export default function GlobalStatusBar() {
             <div className="flex items-center gap-2 mb-1">
               <span className="text-[12px]">{countryFlag(hoveredRisk.code)}</span>
               <span className="font-bold" style={{ color: riskColor(hoveredRisk.risk_level) }}>
-                {hoveredRisk.risk_level}
+                {t(`riskLevel.${hoveredRisk.risk_level}`, hoveredRisk.risk_level)}
               </span>
-              <span className="text-[var(--text-muted)]">Score: {hoveredRisk.risk_score}/100</span>
+              <span className="text-[var(--text-muted)]">{t('statusBar.scoreLabel')}: {hoveredRisk.risk_score}/100</span>
             </div>
             <div className="text-[9px] text-[var(--text-secondary)]">
-              {RISK_TOOLTIPS[hoveredRisk.risk_level] || 'Risk assessment based on global threat data'}
+              {t(`riskTooltip.${hoveredRisk.risk_level}`, t('statusBar.riskFallback'))}
             </div>
             {hoveredRisk.tags?.length > 0 && (
               <div className="flex gap-1 mt-1 justify-center flex-wrap">

@@ -7,6 +7,7 @@ import {
   ChevronDown, ChevronUp, MapPin, ExternalLink, AlertTriangle,
   Newspaper, Clock, Radio, Maximize2, Minimize2
 } from 'lucide-react';
+import { t } from '@/lib/i18n';
 
 interface LiveAlertsProps {
   data: any;
@@ -130,13 +131,13 @@ export default function LiveAlerts({ data, onLocate, onWatchFeed }: LiveAlertsPr
       >
         <div className="flex items-center gap-2">
           <Radio className="w-3.5 h-3.5 text-[#FF4081]" />
-          <span className="hud-text text-[10px] text-[var(--text-primary)]">LIVE ALERTS</span>
+          <span className="hud-text text-[10px] text-[var(--text-primary)]">{t('liveAlerts.title')}</span>
           <span className="gotham-tag gotham-tag--high" style={{ fontSize: '7px', padding: '1px 5px' }}>{alerts.filter(a => a.type === 'news' || a.type === 'quake').length}</span>
-          <span className="gotham-tag gotham-tag--info" style={{ fontSize: '7px', padding: '1px 4px' }}>{BUILTIN_FEEDS.length} FEEDS</span>
+          <span className="gotham-tag gotham-tag--info" style={{ fontSize: '7px', padding: '1px 4px' }}>{BUILTIN_FEEDS.length} {t('liveAlerts.feeds')}</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-1.5 h-1.5 rounded-full bg-[#FF4081] animate-osiris-pulse" />
-          <button onClick={(e) => { e.stopPropagation(); setMaximized(!maximized); if (!expanded && !maximized) setExpanded(true); }} className="hover:text-white transition-colors" title={maximized ? "Restore" : "Maximize"}>
+          <button onClick={(e) => { e.stopPropagation(); setMaximized(!maximized); if (!expanded && !maximized) setExpanded(true); }} className="hover:text-white transition-colors" title={maximized ? t('common.restore') : t('common.maximize')}>
             {maximized ? <Minimize2 className="w-3 h-3 text-[var(--text-muted)]" /> : <Maximize2 className="w-3 h-3 text-[var(--text-muted)]" />}
           </button>
           {expanded ? <ChevronUp className="w-3.5 h-3.5 text-[var(--text-muted)]" /> : <ChevronDown className="w-3.5 h-3.5 text-[var(--text-muted)]" />}
@@ -160,7 +161,7 @@ export default function LiveAlerts({ data, onLocate, onWatchFeed }: LiveAlertsPr
                   onClick={() => setFilter(f)}
                   className={`px-3 py-1.5 rounded text-[10px] font-mono tracking-wider transition-all ${filter === f ? 'bg-[var(--cyan-primary)]/20 text-[var(--cyan-primary)] border border-[var(--cyan-primary)]/50' : 'text-[#8A8880] border border-transparent hover:text-[#E8E6E0] hover:bg-[#2A2A28]'}`}
                 >
-                  {f.toUpperCase()}
+                  {t(`liveAlertsFilter.${f}`, f.toUpperCase())}
                 </button>
               ))}
             </div>
@@ -215,7 +216,7 @@ export default function LiveAlerts({ data, onLocate, onWatchFeed }: LiveAlertsPr
                               className="text-[8px] font-mono text-[var(--cyan-primary)] hover:underline"
                               onClick={(e) => e.stopPropagation()}
                             >
-                              SOURCE
+                              {t('liveAlerts.source')}
                             </a>
                           )}
                         </div>
@@ -232,7 +233,7 @@ export default function LiveAlerts({ data, onLocate, onWatchFeed }: LiveAlertsPr
               </div>
               {filtered.length === 0 && (
                 <div className="text-center py-4 text-[10px] font-mono text-[var(--text-muted)]">
-                  No alerts for this filter
+                  {t('liveAlerts.noAlerts')}
                 </div>
               )}
             </div>

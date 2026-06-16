@@ -8,6 +8,7 @@ import {
   Plane, Ship, Building2, User, Globe, Newspaper, ShieldAlert,
   RefreshCw, Network, Wifi
 } from 'lucide-react';
+import { t as tr } from '@/lib/i18n'; // 本文件已有局部变量 t（图的 target/type），故别名为 tr
 
 const ForceGraph2D = dynamic(() => import('react-force-graph-2d'), { ssr: false });
 
@@ -237,7 +238,7 @@ function EntityGraphPanel({ entity, onClose }: Props) {
         <div className="flex items-center justify-between px-6 py-3 border-b border-[var(--border-primary)] bg-[var(--gold-primary)]/5 relative z-20">
           <div className="flex items-center gap-3">
             <div className="w-1.5 h-1.5 bg-[var(--gold-primary)] animate-osiris-pulse shadow-[0_0_8px_var(--gold-primary)]" />
-            <span className="text-[12px] font-mono font-bold tracking-[0.2em] text-[var(--gold-primary)]">[ OSIRIS // ENTITY INTEL ]</span>
+            <span className="text-[12px] font-mono font-bold tracking-[0.2em] text-[var(--gold-primary)]">[ 烽火 // 实体情报 ]</span>
             {loading && <Loader2 className="w-3.5 h-3.5 text-[var(--gold-primary)] animate-spin" />}
           </div>
           <div className="flex items-center gap-2">
@@ -255,12 +256,12 @@ function EntityGraphPanel({ entity, onClose }: Props) {
           <div className="px-6 py-2 border-b border-[var(--border-primary)] flex items-center gap-3 bg-black/20 relative z-20">
             {(() => { const I = TYPE_ICONS[entity.type] || Globe; return <I className="w-4 h-4" style={{ color: TYPE_COLORS[entity.type] }} />; })()}
             <span className="text-xs font-mono text-white/90 tracking-widest uppercase truncate">{entity.label || entity.id}</span>
-            <span className="text-[10px] font-mono text-[var(--gold-primary)]/70 ml-auto tracking-widest">{graphData.nodes.length} NODES // {graphData.links.length} LINKS</span>
+            <span className="text-[10px] font-mono text-[var(--gold-primary)]/70 ml-auto tracking-widest">{graphData.nodes.length} 节点 // {graphData.links.length} 连接</span>
           </div>
         ) : (
           <div className="px-6 py-3 border-b border-[var(--border-primary)] flex items-center gap-3 bg-black/20 relative z-20">
             <Network className="w-4 h-4 text-[var(--gold-primary)]/50 animate-osiris-pulse" />
-            <span className="text-xs font-mono text-[var(--gold-primary)]/50 tracking-widest uppercase truncate typewriter">[ AWAITING TARGET LOCK ]</span>
+            <span className="text-xs font-mono text-[var(--gold-primary)]/50 tracking-widest uppercase truncate typewriter">[ 等待目标锁定 ]</span>
           </div>
         )}
 
@@ -268,7 +269,7 @@ function EntityGraphPanel({ entity, onClose }: Props) {
         {error && (
           <div className="px-6 py-2 bg-[#FF1744]/10 border-b border-[#FF1744]/30 flex items-center gap-2 relative z-20 shadow-[inset_0_0_15px_rgba(255,23,68,0.2)]">
             <AlertTriangle className="w-3.5 h-3.5 text-[#FF1744]" />
-            <span className="text-[10px] font-mono font-bold tracking-widest text-[#FF1744] uppercase">[ ERR: {error} ]</span>
+            <span className="text-[10px] font-mono font-bold tracking-widest text-[#FF1744] uppercase">[ 错误: {error} ]</span>
           </div>
         )}
 
@@ -289,7 +290,7 @@ function EntityGraphPanel({ entity, onClose }: Props) {
           )}
           {graphData.nodes.length === 0 && !loading && (
             <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-xs font-mono text-white/30">No graph data yet</span>
+              <span className="text-xs font-mono text-white/30">暂无图谱数据</span>
             </div>
           )}
         </div>
@@ -309,7 +310,7 @@ function EntityGraphPanel({ entity, onClose }: Props) {
                 </div>
                 <span className="text-[10px] font-mono font-bold px-2 py-0.5 border"
                   style={{ color: TYPE_COLORS[selectedNode.type], borderColor: `${TYPE_COLORS[selectedNode.type]}80`, background: `${TYPE_COLORS[selectedNode.type]}15`, textShadow: `0 0 5px ${TYPE_COLORS[selectedNode.type]}` }}>
-                  [{selectedNode.type.toUpperCase()}]
+                  [{tr(`entityType.${selectedNode.type}`, selectedNode.type)}]
                 </span>
               </div>
               {selectedNode.properties && Object.keys(selectedNode.properties).length > 0 && (
@@ -320,7 +321,7 @@ function EntityGraphPanel({ entity, onClose }: Props) {
                       <div className="text-[11px] font-mono text-white/90 truncate flex items-center gap-1 mt-0.5">
                         <span className="w-1 h-1 bg-[var(--gold-primary)]/40 inline-block" />
                         <span className="typewriter" style={{ animationDelay: `${i * 0.1}s` }}>
-                          {typeof v === 'boolean' ? (v ? 'YES' : 'NO') : String(v || '—')}
+                          {typeof v === 'boolean' ? (v ? tr('common.yes') : tr('common.no')) : String(v || '—')}
                         </span>
                       </div>
                     </div>
@@ -333,7 +334,7 @@ function EntityGraphPanel({ entity, onClose }: Props) {
                   expandEntity(selectedNode.type, rawId);
                 }} className="btn-tactical w-full mt-4 flex items-center justify-center gap-2" disabled={loading}>
                   {loading ? <Loader2 className="w-3.5 h-3.5 text-[var(--gold-primary)] animate-spin" /> : <RefreshCw className="w-3.5 h-3.5 text-[var(--gold-primary)]" />}
-                  <span className="text-[11px] font-mono font-bold text-[var(--gold-primary)] tracking-[0.2em]">[ ACQUIRE TARGET DATA ]</span>
+                  <span className="text-[11px] font-mono font-bold text-[var(--gold-primary)] tracking-[0.2em]">[ 获取目标数据 ]</span>
                 </button>
               )}
             </motion.div>
@@ -345,7 +346,7 @@ function EntityGraphPanel({ entity, onClose }: Props) {
           {Object.entries(TYPE_COLORS).map(([t, c]) => (
             <div key={t} className="flex items-center gap-1">
               <div className="w-2 h-2 rounded-full" style={{ background: c }} />
-              <span className="text-[8px] font-mono text-white/40 uppercase">{t}</span>
+              <span className="text-[8px] font-mono text-white/40 uppercase">{tr(`entityType.${t}`, t)}</span>
             </div>
           ))}
         </div>

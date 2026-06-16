@@ -3,16 +3,17 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Keyboard, X } from 'lucide-react';
+import { t } from '@/lib/i18n';
 
 const SHORTCUTS = [
-  { key: 'F', desc: 'Toggle fullscreen' },
-  { key: 'S', desc: 'Share current view' },
-  { key: 'L', desc: 'Toggle layer panel' },
-  { key: 'M', desc: 'Toggle markets panel' },
-  { key: 'I', desc: 'Toggle intel feed' },
-  { key: 'R', desc: 'Reset to global view' },
-  { key: '?', desc: 'Show this help' },
-  { key: 'ESC', desc: 'Close panels / popups' },
+  { key: 'F', desc: '切换全屏' },
+  { key: 'S', desc: '分享当前视图' },
+  { key: 'L', desc: '切换图层面板' },
+  { key: 'M', desc: '切换市场面板' },
+  { key: 'I', desc: '切换情报流' },
+  { key: 'R', desc: '重置为全球视图' },
+  { key: '?', desc: '显示此帮助' },
+  { key: 'ESC', desc: '关闭面板 / 弹窗' },
 ];
 
 export default function KeyboardShortcuts() {
@@ -46,7 +47,7 @@ export default function KeyboardShortcuts() {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <Keyboard className="w-4 h-4 text-[var(--gold-primary)]" />
-                <span className="text-sm font-mono font-bold text-[var(--text-heading)] tracking-wider">SHORTCUTS</span>
+                <span className="text-sm font-mono font-bold text-[var(--text-heading)] tracking-wider">{t('shortcuts.title')}</span>
               </div>
               <button onClick={() => setIsOpen(false)} className="text-[var(--text-muted)] hover:text-[var(--text-primary)]">
                 <X className="w-4 h-4" />
@@ -63,7 +64,7 @@ export default function KeyboardShortcuts() {
               ))}
             </div>
             <div className="mt-4 text-center text-[7px] font-mono text-[var(--text-muted)] tracking-widest">
-              PRESS [?] OR [ESC] TO CLOSE
+              {t('shortcuts.closeHint')}
             </div>
           </motion.div>
         </motion.div>
