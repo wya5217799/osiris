@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Newspaper, AlertTriangle, Brain } from 'lucide-react'; // 三者均已确认存在于现有组件 import
 import IntelFusionPanel from '@/components/cn/IntelFusionPanel';
+import SentinelAlertsPanel from '@/components/cn/SentinelAlertsPanel';
 
 /* ═══════════════════════════════════════════════════════════════
    烽火 Fanos — 中文情报面板组（就地优化 Osiris，新增文件，零改现有组件）
@@ -70,7 +71,7 @@ export default function ChinesePanels({ onLocate }: Props) {
             className="absolute right-12 top-1/2 -translate-y-1/2 w-80"
           >
             {active === 'fusion' && <IntelFusionPanel onLocate={onLocate} />}
-            {active === 'alerts' && <Placeholder title="哨兵告警" note="切片 2 开放" />}
+            {active === 'alerts' && <SentinelAlertsPanel onLocate={onLocate} />}
             {active === 'history' && <Placeholder title="问历史" note="切片 3 开放" />}
           </motion.div>
         )}
