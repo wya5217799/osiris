@@ -18,6 +18,7 @@ interface OsirisMapProps {
   scanTargets?: any[];
   demoMode?: boolean;
   theme?: 'core' | 'ghost';
+  timeCursor?: number; // M6 时间轴游标（epoch ms）；仅显示 time_window 含此刻的情报条目
 }
 
 function computeSolarTerminator(): [number, number][] {
@@ -42,7 +43,7 @@ function computeSolarTerminator(): [number, number][] {
 
 const EMPTY_FC = { type: 'FeatureCollection' as const, features: [] };
 
-function OsirisMap({ data, activeLayers, onEntityClick, onMouseCoords, onRightClick, onViewStateChange, flyToLocation, projection = 'globe', mapStyle = 'dark', sweepData, scanTargets = [], demoMode = false, theme = 'core' }: OsirisMapProps) {
+function OsirisMap({ data, activeLayers, onEntityClick, onMouseCoords, onRightClick, onViewStateChange, flyToLocation, projection = 'globe', mapStyle = 'dark', sweepData, scanTargets = [], demoMode = false, theme = 'core', timeCursor }: OsirisMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const popupRef = useRef<maplibregl.Popup | null>(null);
@@ -1320,6 +1321,18 @@ function OsirisMap({ data, activeLayers, onEntityClick, onMouseCoords, onRightCl
         },
       })));
   }, [mapReady, data.intelligence_items, activeLayers.intel_items, setGeo]);
+
+  // M6 时间轴：游标过滤——只显示 time_window 含游标的情报条目（undefined 时清过滤，全显）
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapReady) return;
+    const filter = (typeof timeCursor === 'number')
+      ? (['all', ['<=', ['get', 't_start'], timeCursor], ['>=', ['get', 't_end'], timeCursor]] as any)
+      : null;
+    ['intel-items-dots', 'intel-items-glow', 'intel-items-label'].forEach((id) => {
+      if (map.getLayer(id)) map.setFilter(id, filter);
+    });
+  }, [mapReady, timeCursor]);
 
   // Visibility
   useEffect(() => {

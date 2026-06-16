@@ -16,6 +16,7 @@ import KeyboardShortcuts from '@/components/KeyboardShortcuts';
 import GlobalStatusBar from '@/components/GlobalStatusBar';
 import LiveAlerts from '@/components/LiveAlerts';
 import ChinesePanels from '@/components/ChinesePanels';
+import TimelineScrubber from '@/components/TimelineScrubber';
 
 const OsirisMap = dynamic(() => import('@/components/OsirisMap'), { ssr: false });
 const LayerPanel = dynamic(() => import('@/components/LayerPanel'));
@@ -116,6 +117,7 @@ export default function Dashboard() {
   const [entityGraphTarget, setEntityGraphTarget] = useState<{ type: string; id: string; label?: string; properties?: Record<string, any> } | null>(null);
   const [demoMode, setDemoMode] = useState(false);
   const [osirisTheme, setOsirisTheme] = useState<'core'|'ghost'>('core');
+  const [timeCursor, setTimeCursor] = useState<number | undefined>(undefined); // M6 时间轴游标（epoch ms）
 
   useEffect(() => {
     document.body.className = osirisTheme === 'core' ? '' : `theme-${osirisTheme}`;
@@ -771,6 +773,7 @@ export default function Dashboard() {
           scanTargets={scanTargets}
           demoMode={demoMode}
           theme={osirisTheme}
+          timeCursor={timeCursor}
         />
       </ErrorBoundary>
 
@@ -1213,6 +1216,9 @@ export default function Dashboard() {
 
       {/* ── GLOBAL STATUS TICKER (bottom) ── */}
       <GlobalStatusBar />
+
+      {/* ── 烽火 Fanos 时间轴回放（M6）── */}
+      <TimelineScrubber items={data.intelligence_items} active={activeLayers.intel_items} onCursor={setTimeCursor} />
 
       {/* Shortcut hint */}
       <div className="desktop-only absolute bottom-[26px] right-5 z-[200] pointer-events-none text-[6px] font-mono text-[var(--text-muted)]/40 tracking-widest">
