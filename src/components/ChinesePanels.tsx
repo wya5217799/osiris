@@ -5,11 +5,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Newspaper, AlertTriangle, Brain } from 'lucide-react'; // 三者均已确认存在于现有组件 import
 import IntelFusionPanel from '@/components/cn/IntelFusionPanel';
 import SentinelAlertsPanel from '@/components/cn/SentinelAlertsPanel';
+import HistoryQueryPanel from '@/components/cn/HistoryQueryPanel';
 
 /* ═══════════════════════════════════════════════════════════════
    烽火 Fanos — 中文情报面板组（就地优化 Osiris，新增文件，零改现有组件）
    单一 active state 天然互斥；slide-out 复用现有右工具条定位类。
-   切 1：融合情报面板已接；哨兵告警/问历史为占位，切 2/3 替换。
+   三面板（融合情报 / 哨兵告警 / 问历史）均已接入真 historian 读 API。
    ═══════════════════════════════════════════════════════════════ */
 
 type Panel = 'fusion' | 'alerts' | 'history';
@@ -23,24 +24,6 @@ const BUTTONS: { key: Panel; Icon: typeof Newspaper; label: string; activeColor:
   { key: 'alerts', Icon: AlertTriangle, label: '哨兵告警', activeColor: 'text-[var(--alert-red)]' },
   { key: 'history', Icon: Brain, label: '问历史', activeColor: 'text-[var(--cyan-primary)]' },
 ];
-
-function Placeholder({ title, note }: { title: string; note: string }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.4 }}
-      className="glass-panel flex flex-col overflow-hidden pointer-events-auto"
-    >
-      <div className="px-4 py-3">
-        <span className="hud-text text-[12px] text-[var(--text-primary)]">{title}</span>
-      </div>
-      <div className="px-4 py-8 text-center">
-        <span className="text-[11px] font-mono text-[var(--text-muted)] tracking-widest">{note}</span>
-      </div>
-    </motion.div>
-  );
-}
 
 export default function ChinesePanels({ onLocate }: Props) {
   const [active, setActive] = useState<Panel | null>(null);
@@ -72,7 +55,7 @@ export default function ChinesePanels({ onLocate }: Props) {
           >
             {active === 'fusion' && <IntelFusionPanel onLocate={onLocate} />}
             {active === 'alerts' && <SentinelAlertsPanel onLocate={onLocate} />}
-            {active === 'history' && <Placeholder title="问历史" note="切片 3 开放" />}
+            {active === 'history' && <HistoryQueryPanel onLocate={onLocate} />}
           </motion.div>
         )}
       </AnimatePresence>
