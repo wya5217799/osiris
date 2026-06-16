@@ -154,6 +154,7 @@ export default function Dashboard() {
     sdk_naval: true,
     
     malware: false,
+    intel_items: true, // 烽火 Fanos 融合情报条目（地图层 + M6 时间轴回放）
   });
   const [liveFeedUrl, setLiveFeedUrl] = useState<string | null>(null);
   const [liveFeedName, setLiveFeedName] = useState('');
@@ -331,6 +332,8 @@ export default function Dashboard() {
     // Priority 1: Core feeds (always needed for panels)
     fetchEndpoint('/api/earthquakes');
     fetchEndpoint('/api/news');
+    // 烽火 Fanos 融合情报条目（地图层 + 时间轴回放数据源）— 一次拉全开窗，时间轴在客户端过滤
+    fetchEndpoint('/api/historian/items?status=open&limit=500', d => ({ intelligence_items: d.items }));
     const marketTimer = setTimeout(() => fetchEndpoint('/api/markets', d => ({ markets: d })), 800);
 
     // Priority 2: Space Weather (needed for MarketsPanel)
@@ -346,6 +349,7 @@ export default function Dashboard() {
       setInterval(() => fetchEndpoint('/api/earthquakes'), 900000),  // 15 min (was 5)
       setInterval(() => fetchEndpoint('/api/news'), 1800000),        // 30 min (was 10)
       setInterval(() => fetchEndpoint('/api/markets', d => ({ markets: d })), 900000), // 15 min (was 5)
+      setInterval(() => fetchEndpoint('/api/historian/items?status=open&limit=500', d => ({ intelligence_items: d.items })), 120000), // 2 min
     ];
     return () => {
       clearTimeout(marketTimer);

@@ -181,7 +181,7 @@ function OsirisMap({ data, activeLayers, onEntityClick, onMouseCoords, onRightCl
       createDot(map, 'dot-fire', isGhost ? phantomPurple : '#E65100', 10);
       createDot(map, 'dot-cctv', cameraColor, 10);
 
-      const sources = ['flights','military','jets','private-fl','satellites','earthquakes','gdelt','gps-jamming','day-night','cctv','fires','weather','infrastructure','maritime','maritime-choke','maritime-ships','live-news','sigint-news','conflict-zones', 'war-alerts-targets', 'war-alerts-lines', 'balloons', 'radiation', 'ip-sweep-devices', 'ip-sweep-pulse', 'ip-sweep-connections', 'scan-targets', 'sdk-entities', 'sdk-links', 'malware-nodes', 'network-mesh'];
+      const sources = ['flights','military','jets','private-fl','satellites','earthquakes','gdelt','gps-jamming','day-night','cctv','fires','weather','infrastructure','maritime','maritime-choke','maritime-ships','live-news','sigint-news','conflict-zones', 'war-alerts-targets', 'war-alerts-lines', 'balloons', 'radiation', 'ip-sweep-devices', 'ip-sweep-pulse', 'ip-sweep-connections', 'scan-targets', 'sdk-entities', 'sdk-links', 'malware-nodes', 'network-mesh', 'intel-items'];
       sources.forEach(s => map.addSource(s, { type: 'geojson', data: EMPTY_FC }));
 
       // Warning icon generator (parameterized — eliminates 3x copy-paste)
@@ -277,6 +277,22 @@ function OsirisMap({ data, activeLayers, onEntityClick, onMouseCoords, onRightCl
         'text-field': ['get','malware'], 'text-size': 8, 'text-font': ['JetBrains Mono Bold', 'Open Sans Bold'],
         'text-offset': [0, 1.5], 'text-max-width': 10, 'text-allow-overlap': false,
       }, paint: { 'text-color': '#D32F2F', 'text-halo-color': '#111', 'text-halo-width': 1.5, 'text-opacity': 0.85 }});
+
+      // ══ 烽火 Fanos — 融合情报条目（intel items，金色；M6 时间轴回放层）══
+      const intelColor = isGhost ? phantomPurple : '#D4AF37';
+      map.addLayer({ id: 'intel-items-glow', type: 'circle', source: 'intel-items', paint: {
+        'circle-radius': ['interpolate',['linear'],['zoom'], 1,8, 5,16, 10,26],
+        'circle-color': intelColor, 'circle-opacity': 0.10, 'circle-blur': 0.6,
+      }});
+      map.addLayer({ id: 'intel-items-dots', type: 'circle', source: 'intel-items', paint: {
+        'circle-radius': ['interpolate',['linear'],['get','score'], 0,4, 50,8, 100,13],
+        'circle-color': intelColor, 'circle-opacity': 0.92,
+        'circle-stroke-width': 1.5, 'circle-stroke-color': '#000000', 'circle-stroke-opacity': 0.85,
+      }});
+      map.addLayer({ id: 'intel-items-label', type: 'symbol', source: 'intel-items', minzoom: 4, layout: {
+        'text-field': ['get','label'], 'text-size': ['interpolate',['linear'],['zoom'], 4,8, 8,11],
+        'text-font': ['Open Sans Regular'], 'text-offset': [0, 1.6], 'text-max-width': 14, 'text-allow-overlap': false,
+      }, paint: { 'text-color': intelColor, 'text-halo-color': '#000', 'text-halo-width': 1.5, 'text-opacity': 0.85 }});
 
       // ── NETWORK INTEL MESH (SDK STYLE) ──
       map.addLayer({ id: 'network-mesh-atmo', type: 'line', source: 'network-mesh', paint: {
@@ -792,7 +808,7 @@ function OsirisMap({ data, activeLayers, onEntityClick, onMouseCoords, onRightCl
     });
 
     // ── Generic hover for clickables ──
-    ['conflict-icons','cctv-dots','eq-circles','sat-dots','fires-heat','gdelt-dots','weather-dots','infra-dots','maritime-dots','choke-dots','news-dots','sigint-news-dots','balloon-dots','rad-dots','ship-dots','sweep-device-dots','scan-targets-dots','sdk-sea','sdk-sea-glow','sdk-sea-atmo','sdk-air','sdk-air-glow','sdk-air-atmo','sdk-intel','sdk-intel-glow','sdk-intel-atmo','malware-dots'].forEach(layer => {
+    ['conflict-icons','cctv-dots','eq-circles','sat-dots','fires-heat','gdelt-dots','weather-dots','infra-dots','maritime-dots','choke-dots','news-dots','sigint-news-dots','balloon-dots','rad-dots','ship-dots','sweep-device-dots','scan-targets-dots','sdk-sea','sdk-sea-glow','sdk-sea-atmo','sdk-air','sdk-air-glow','sdk-air-atmo','sdk-intel','sdk-intel-glow','sdk-intel-atmo','malware-dots','intel-items-dots'].forEach(layer => {
       map.on('mouseenter', layer, () => { map.getCanvas().style.cursor = 'pointer'; });
       map.on('mouseleave', layer, () => { map.getCanvas().style.cursor = ''; });
     });
@@ -1283,6 +1299,28 @@ function OsirisMap({ data, activeLayers, onEntityClick, onMouseCoords, onRightCl
   }, [mapReady, setGeo]);
 
 
+  // 烽火 Fanos 融合情报条目 → GeoJSON（geo_area 质心点；t_start/t_end 存 epoch ms 供时间轴 setFilter）
+  useEffect(() => {
+    if (!mapReady) return;
+    const items = (activeLayers.intel_items && Array.isArray(data.intelligence_items)) ? data.intelligence_items : [];
+    setGeo('intel-items', items
+      .filter((it: any) => typeof it.lat === 'number' && typeof it.lng === 'number')
+      .map((it: any) => ({
+        type: 'Feature' as const,
+        geometry: { type: 'Point' as const, coordinates: [it.lng, it.lat] },
+        properties: {
+          item_id: it.item_id,
+          score: it.score ?? 0,
+          summary: it.summary ?? '',
+          label: it.summary ? (it.summary.length > 18 ? it.summary.slice(0, 18) + '…' : it.summary) : '情报条目',
+          source_types: Array.isArray(it.source_types) ? it.source_types.join('·') : '',
+          // 非 RFC3339（空格分隔）→ 先 .replace 再 parse；NULL 窗用 ±Infinity 兜底（始终显示）
+          t_start: it.window_start ? Date.parse(String(it.window_start).replace(' ', 'T')) : -8640000000000000,
+          t_end: it.window_end ? Date.parse(String(it.window_end).replace(' ', 'T')) : 8640000000000000,
+        },
+      })));
+  }, [mapReady, data.intelligence_items, activeLayers.intel_items, setGeo]);
+
   // Visibility
   useEffect(() => {
     if (!mapReady) return;
@@ -1291,6 +1329,7 @@ function OsirisMap({ data, activeLayers, onEntityClick, onMouseCoords, onRightCl
     setVis(['gdelt-dots'], activeLayers.global_incidents);
 
     setVis(['malware-glow','malware-dots','malware-label'], activeLayers.malware);
+    setVis(['intel-items-glow','intel-items-dots','intel-items-label'], activeLayers.intel_items);
     setVis(['network-mesh-atmo', 'network-mesh-glow', 'network-mesh-core'], activeLayers.internet_outages || activeLayers.malware);
     setVis(['jam-fill','jam-label'], activeLayers.gps_jamming);
     setVis(['day-night-fill'], activeLayers.day_night);
