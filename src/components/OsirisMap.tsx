@@ -156,9 +156,11 @@ function OsirisMap({ data, activeLayers, onEntityClick, onMouseCoords, onRightCl
       },
     });
 
+    // 立刻持有 map 引用（不等 'load'）：让上面的 mapRef.current 初始化守卫即时生效，并消除
+    // 「effect 已跑但 'load' 未触发」窗口里 mapRef 为 null 的竞态。图层操作仍由 mapReady 把关。
+    mapRef.current = map;
+
     map.on('load', () => {
-      mapRef.current = map;
-      
       // Theme colors
       const isGhost = theme === 'ghost';
       const phantomPurple = '#B388FF';
@@ -670,6 +672,24 @@ function OsirisMap({ data, activeLayers, onEntityClick, onMouseCoords, onRightCl
           <div><span style="color:#5C5A54;">COORDS</span><br/><span style="color:#E8E6E0;">${coords[1].toFixed(3)}, ${coords[0].toFixed(3)}</span></div>
         </div>
         <a href="${p.source === 'NIGGG-BAS' ? 'https://ndc.niggg.bas.bg/' : `https://earthquake.usgs.gov/earthquakes/eventpage/${p.id||''}`}" target="_blank" style="${linkStyle}color:#FF9500;border:1px solid rgba(255,149,0,0.4);background:rgba(255,149,0,0.1);">📊 ${p.source === 'NIGGG-BAS' ? 'NIGGG-BAS' : 'USGS DETAILS'}</a>
+      </div>`);
+    });
+
+    // ── Intelligence Items (M6 金色情报层：点开看中文研判摘要；hover 光标在下方统一注册) ──
+    map.on('click', 'intel-items-dots', e => {
+      if (!e.features?.length) return;
+      const p = e.features[0].properties as any;
+      const coords = (e.features[0].geometry as any).coordinates;
+      const esc = (s: any) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const summary = (p.summary && String(p.summary).trim()) ? esc(p.summary) : '（暂无中文研判摘要）';
+      const score = typeof p.score === 'number' ? p.score.toFixed(0) : (p.score || '—');
+      popup(coords, `<div style="${pStyle}border:1px solid rgba(212,175,55,0.45);box-shadow:inset 0 0 12px rgba(212,175,55,0.08);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <span style="color:#D4AF37;font-size:13px;font-weight:700;letter-spacing:0.1em;">⭐ 情报条目</span>
+          <span style="color:#5C5A54;font-size:9px;">同现 ${esc(score)}</span>
+        </div>
+        ${p.source_types ? `<div style="font-size:9px;color:#8C8A84;margin-bottom:8px;">来源：${esc(p.source_types)}</div>` : ''}
+        <div style="font-size:11px;line-height:1.6;color:#E8E6E0;white-space:pre-wrap;">${summary}</div>
       </div>`);
     });
 
@@ -1267,6 +1287,7 @@ function OsirisMap({ data, activeLayers, onEntityClick, onMouseCoords, onRightCl
     setGeo('sigint-news', activeLayers.news_intel && items.length > 0
       ? items.filter((n: any) => n.coords?.length === 2).map((n: any) => ({
           type: 'Feature',
+          // news API 的 coords 是 [lat,lng]（见 api/news KEYWORD_COORDS），GeoJSON 要 [lng,lat] → 故交换
           geometry: { type: 'Point', coordinates: [n.coords[1], n.coords[0]] },
           properties: { title: n.title, source: n.source, risk_score: n.risk_score, link: n.link }
         }))

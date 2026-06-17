@@ -69,16 +69,22 @@ export default function TimelineScrubber({ items, active = true, onCursor }: Pro
     if (range && cursor == null) setCursor(range.hi);
   }, [range, cursor]);
 
-  // 游标上抛父级 → 驱动 OsirisMap setFilter
+  // 游标上抛父级 → 驱动 OsirisMap setFilter。onCursor 走 ref：不放进 deps，避免父级传未
+  // memo 的内联回调时「新引用→effect 重跑→setState→父重渲染」的死循环。
+  const onCursorRef = useRef(onCursor);
+  onCursorRef.current = onCursor;
   useEffect(() => {
-    onCursor(cursor ?? undefined);
-  }, [cursor, onCursor]);
+    onCursorRef.current(cursor ?? undefined);
+  }, [cursor]);
 
-  // 播放循环：rAF 推进虚拟时钟，到末端循环回起点
+  // 播放循环：rAF 推进虚拟时钟，到末端循环回起点。cancelled 闭包标志确保快速 play 切换时
+  // 旧循环立即停（cleanup 早于已排队的 rAF 触发也不会双跑 → 防 2× 速）。
   useEffect(() => {
     if (!playing || !range) return;
     const span = range.hi - range.lo;
+    let cancelled = false;
     const tick = (now: number) => {
+      if (cancelled) return;
       if (lastRef.current == null) lastRef.current = now;
       const dt = now - lastRef.current;
       lastRef.current = now;
@@ -91,6 +97,7 @@ export default function TimelineScrubber({ items, active = true, onCursor }: Pro
     };
     rafRef.current = requestAnimationFrame(tick);
     return () => {
+      cancelled = true;
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       lastRef.current = null;
     };
