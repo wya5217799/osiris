@@ -161,6 +161,23 @@ function OsirisMap({ data, activeLayers, onEntityClick, onMouseCoords, onRightCl
     mapRef.current = map;
 
     map.on('load', () => {
+      // 汉化底图标注：CARTO/OpenMapTiles 默认是 {name:latin}\n{name:nonlatin}（拉丁在上）。
+      // 改成「简体中文优先的中英双语」——有中文名时「简体中文\n英文」两行（中文在上），没有中文名
+      // 则只显示英文/拉丁。简体优先 name:zh-Hans，再退 name:zh。只在添加本应用图层前改写底图自带的
+      // symbol 图层；本应用图层(text-field 取 feed 自带的 label/name)不受影响。
+      const enLabel: unknown = ['coalesce', ['get', 'name:en'], ['get', 'name:latin'], ['get', 'name']];
+      for (const layer of (map.getStyle().layers || [])) {
+        if (layer.type !== 'symbol') continue;
+        const tf = (layer as { layout?: Record<string, unknown> }).layout?.['text-field'];
+        if (!tf || !JSON.stringify(tf).includes('name')) continue;
+        map.setLayoutProperty(layer.id, 'text-field', [
+          'case',
+          ['has', 'name:zh-Hans'], ['concat', ['get', 'name:zh-Hans'], '\n', enLabel],
+          ['has', 'name:zh'], ['concat', ['get', 'name:zh'], '\n', enLabel],
+          enLabel,
+        ] as unknown as maplibregl.ExpressionSpecification);
+      }
+
       // Theme colors
       const isGhost = theme === 'ghost';
       const phantomPurple = '#B388FF';
