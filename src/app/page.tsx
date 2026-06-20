@@ -322,6 +322,11 @@ export default function Dashboard() {
         dataRef.current = { ...dataRef.current, ...d };
         setDataVersion(v => v + 1);
         setBackendStatus('connected');
+      } else {
+        // A non-2xx (e.g. historian 400 bad-param / 502 unreachable — fetch does NOT throw on these)
+        // must flip the status like the catch does; else the layer silently keeps stale data and
+        // the indicator wrongly stays 'connected'.
+        setBackendStatus('error');
       }
     } catch (e) {
       console.warn('[OSIRIS] Suppressed error:', e instanceof Error ? e.message : e);

@@ -13,8 +13,10 @@ const SSE_HEADERS = {
   'X-Accel-Buffering': 'no', // 关掉中间层缓冲，保证逐事件下发
 } as const;
 
+// 用 200 而非 502：EventSource 规范规定非 200 响应直接 fail 连接、丢弃 body，那条 `event: error`
+// 帧浏览器根本读不到。返 200 + 错误帧后即自然关流，前端的 'error' 监听器能收到帧，随后自动重连。
 function sseError(message: string): Response {
-  return new Response(`event: error\ndata: ${message}\n\n`, { status: 502, headers: SSE_HEADERS });
+  return new Response(`event: error\ndata: ${message}\n\n`, { status: 200, headers: SSE_HEADERS });
 }
 
 export async function GET(request: NextRequest): Promise<Response> {

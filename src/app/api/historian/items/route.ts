@@ -30,7 +30,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       // 超时 + 客户端断开任一触发即中止上游 → 频繁拖时间轴/导航时不让 historian 连接空跑
       signal: AbortSignal.any([AbortSignal.timeout(10_000), request.signal]),
     });
-    // historian 在 bbox 非法时返回 HTTP 200 + {error,items:[]}，这里只透传，由前端判 body
+    // historian 在 bbox/时间戳非法时返回 HTTP 400 + {error,items:[]}；status 已透传，前端按 !res.ok 判。
     const data = await upstream.json();
     return NextResponse.json(data, { status: upstream.status, headers: NO_STORE });
   } catch (err: unknown) {

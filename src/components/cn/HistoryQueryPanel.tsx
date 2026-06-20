@@ -10,8 +10,9 @@ interface NlResult {
   rows: Array<Array<string | number | boolean | null>>;
   answer_zh: string;
 }
-// 失败形态：空问题→HTTP 200 + {error}；上游异常（缺 key/SQL 被拒/PG 错）→HTTP 500 + {detail}
-type NlResp = NlResult | { error: string; rows: [] } | { detail: string };
+// 失败形态：空问题→HTTP 400 + {error,rows:[]}；上游异常（缺 key/SQL 被拒/PG 错）→HTTP 500 +
+// {route:null,error,rows:[]}；BFF 上游不可达→502 {error,rows:[]}。统一 {error}，按 !res.ok 判。
+type NlResp = NlResult | { error: string; rows: [] };
 
 const SUGGESTIONS = ['数据库里有几条情报条目？', '最近的高分情报是什么？', '一共有哪些来源类型？'];
 
@@ -42,8 +43,7 @@ export default function HistoryQueryPanel() {
         });
         const json: NlResp = await res.json();
         if (!res.ok) {
-          const msg = 'error' in json && json.error ? json.error : 'detail' in json && json.detail ? json.detail : `HTTP ${res.status}`;
-          throw new Error(msg);
+          throw new Error('error' in json && json.error ? json.error : `HTTP ${res.status}`);
         }
         // 成功判据：body 含 sql（空问题是 200+error）
         if (!('sql' in json)) throw new Error('error' in json && json.error ? json.error : 'NL 服务返回异常');

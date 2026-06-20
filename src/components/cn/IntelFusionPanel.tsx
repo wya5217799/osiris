@@ -30,8 +30,11 @@ export default function IntelFusionPanel() {
       // 客户端浏览器 fetch：Next 的 next:{revalidate} 在此无效，只能用标准 cache:'no-store'
       const res = await fetch('/api/historian/items?status=open&limit=50', { cache: 'no-store', signal });
       const json: ItemsResp = await res.json();
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      if ('error' in json && json.error) throw new Error(json.error); // bbox 非法是 200+error
+      // 优先用后端的描述性 {error}（如「bbox must be ...」），再回退 HTTP 码。bbox/时间戳非法现为
+      // HTTP 400 + {error}（非旧的 200）；先 throw HTTP 码会把好文案吞成「HTTP 400」。
+      if (!res.ok || ('error' in json && json.error)) {
+        throw new Error('error' in json && json.error ? json.error : `HTTP ${res.status}`);
+      }
       setItems(Array.isArray(json.items) ? json.items : []);
     } catch (err: unknown) {
       if (err instanceof DOMException && err.name === 'AbortError') return; // 卸载/重入忽略

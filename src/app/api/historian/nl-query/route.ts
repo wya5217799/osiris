@@ -21,10 +21,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       cache: 'no-store',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify(body),
-      // ★ text-to-SQL + 中文答合成同步走 DeepSeek，秒级 → 45s 超时
-      signal: AbortSignal.timeout(45_000),
+      // ★ text-to-SQL + 中文答合成同步走 DeepSeek，秒级 → 45s 超时。并入 request.signal：用户
+      //   导航/重入(HistoryQueryPanel 会 abort 上一次)时，取消一路传到 historian，不让 DeepSeek 空跑。
+      signal: AbortSignal.any([AbortSignal.timeout(45_000), request.signal]),
     });
-    const data = await upstream.json(); // 上游异常时为 HTTP 500 {detail:...}
+    // historian 透传状态码：空问题 400 {error}/内部失败 500 {route:null,error}/成功 {sql,rows,answer_zh}
+    const data = await upstream.json();
     return NextResponse.json(data, { status: upstream.status, headers: NO_STORE });
   } catch (err: unknown) {
     console.error('[historian-bff] /nl-query 代理失败:', err);

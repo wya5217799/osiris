@@ -61,8 +61,10 @@ export default function SupplyChainPanel() {
       // 客户端浏览器 fetch：标准 cache:'no-store'（Next 的 next:{revalidate} 在此无效）
       const res = await fetch('/api/historian/supply-chain?window_days=7', { cache: 'no-store', signal });
       const json: Resp = await res.json();
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      if ('error' in json && json.error) throw new Error(json.error); // historian 不可达是 200/502+error
+      // 优先用后端描述性 {error}，再回退 HTTP 码（先 throw HTTP 码会把 body 里的好文案吞掉）。
+      if (!res.ok || ('error' in json && json.error)) {
+        throw new Error('error' in json && json.error ? json.error : `HTTP ${res.status}`);
+      }
       setNodes(Array.isArray(json.nodes) ? json.nodes : []);
     } catch (err: unknown) {
       if (err instanceof DOMException && err.name === 'AbortError') return; // 卸载/重入忽略
