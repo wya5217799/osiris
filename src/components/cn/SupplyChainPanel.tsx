@@ -34,6 +34,9 @@ const CATEGORY_LABEL: Record<string, string> = {
   automotive: '汽车',
   battery: '电池',
   maritime: '海运',
+  mining: '矿产',
+  energy_production: '能源',
+  agriculture: '农业',
 };
 
 // band → 应力分配色（band 值与 gotham-tag--{band} 一致；critical 红/high 橙/medium 金/low 绿）
