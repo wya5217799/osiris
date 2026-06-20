@@ -28,6 +28,26 @@ export default function SentinelAlertsPanel() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(true);
+  const [acting, setActing] = useState<string | null>(null); // 正在推进状态的 alert_id
+
+  // SOAR「act」一环：把告警推进到 to 态。成功即从「新告警」列表乐观移除（离开 new 态）；
+  // 失败静默——下一次轮询 / SSE 会纠正显示。historian 经 BFF 校验非法转移返 409。
+  const transition = useCallback(async (alertId: string, to: string) => {
+    setActing(alertId);
+    try {
+      const res = await fetch(`/api/historian/alerts/${alertId}/transition`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        body: JSON.stringify({ to }),
+      });
+      if (res.ok) setAlerts((prev) => prev.filter((a) => a.alert_id !== alertId));
+    } catch {
+      /* 网络/上游错误：静默，靠轮询纠正 */
+    } finally {
+      setActing(null);
+    }
+  }, []);
 
   const load = useCallback(async (signal: AbortSignal) => {
     setLoading(true);
@@ -137,6 +157,19 @@ export default function SentinelAlertsPanel() {
                       {a.title || '（无标题）'}
                     </h4>
                     <span className="text-[8px] font-mono text-[var(--text-muted)]">状态：{a.status}</span>
+                    <div className="flex items-center gap-1.5 mt-1.5">
+                      {([['ack', '确认'], ['snoozed', '静默'], ['resolved', '解决']] as const).map(([to, label]) => (
+                        <button
+                          key={to}
+                          data-testid={`alert-action-${to}`}
+                          onClick={() => transition(a.alert_id, to)}
+                          disabled={acting === a.alert_id}
+                          className="text-[8px] font-mono px-1.5 py-0.5 rounded border border-[var(--border-secondary)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[var(--cyan-primary)] transition-colors disabled:opacity-40"
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 ))
               )}
