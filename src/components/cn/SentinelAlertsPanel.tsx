@@ -82,9 +82,12 @@ export default function SentinelAlertsPanel() {
     const es = new EventSource('/api/historian/alerts/stream');
     const ctrl = new AbortController();
     const onAlert = () => load(ctrl.signal); // SSE 只当“变更信号”，full alert 仍走现成 load
-    // 后端 LISTEN 线程挂掉时会发具名 `event: error` 再关流；EventSource 对「具名 error 帧」和
-    // 「传输层断连」都派发到 'error' 监听器。立即拉一次兜底（不等 30s 轮询），EventSource 随后自动重连。
-    const onStreamError = () => load(ctrl.signal);
+    // 后端 LISTEN 线程挂掉时会发具名 `event: error` 再关流。EventSource 对「具名 error 帧」(MessageEvent)
+    // 和「传输层断连」(普通 Event) 都派发到 'error' 监听器——只在具名帧时拉一次兜底（后端仍在、轮询能成）；
+    // 传输层断连说明 historian/BFF 不可达，拉也会失败，交给 EventSource 自动重连即可，避免每个重连周期翻倍拉取。
+    const onStreamError = (e: Event) => {
+      if (e instanceof MessageEvent) load(ctrl.signal);
+    };
     es.addEventListener('alert', onAlert);
     es.addEventListener('error', onStreamError);
     return () => {

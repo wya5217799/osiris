@@ -29,6 +29,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const data = await upstream.json();
     return NextResponse.json(data, { status: upstream.status, headers: NO_STORE });
   } catch (err: unknown) {
+    // 客户端导航/重入取消（HistoryQueryPanel 会 abort 上一次）：现在 request.signal 已并入中止链，
+    // 这是正常路径而非错误——不刷错误日志，回 499（客户端已走，仅占位）。同 items 路由的守卫。
+    if (request.signal.aborted) {
+      return NextResponse.json({ error: '请求已取消', rows: [] }, { status: 499, headers: NO_STORE });
+    }
     console.error('[historian-bff] /nl-query 代理失败:', err);
     return NextResponse.json(
       { error: 'NL 服务不可用', rows: [] },
