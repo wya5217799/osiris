@@ -118,6 +118,10 @@ export default function Dashboard() {
   const [demoMode, setDemoMode] = useState(false);
   const [osirisTheme, setOsirisTheme] = useState<'core'|'ghost'>('core');
   const [timeCursor, setTimeCursor] = useState<number | undefined>(undefined); // M6 时间轴游标（epoch ms）
+  // M6 时间轴密度叠加：游标时刻的 geo-event 密度（historian /history/events，CAGG 速度层）
+  const [historyEvents, setHistoryEvents] = useState<Array<{ lat: number; lng: number; count: number; avg_sev: number | null }>>([]);
+  const timeCursorRef = useRef<number | undefined>(undefined);
+  timeCursorRef.current = timeCursor; // 最新游标 ref：供轮询读「当前」值而不把 effect 钉在每帧变化的 timeCursor 上
 
   useEffect(() => {
     document.body.className = osirisTheme === 'core' ? '' : `theme-${osirisTheme}`;
@@ -364,6 +368,42 @@ export default function Dashboard() {
       intervals.forEach(clearInterval);
     };
   }, [fetchEndpoint]);
+
+  // M6 时间轴密度叠加：游标移动时拉取该时刻的 geo-event 密度（CAGG 速度层，窗口 [t-24h, t)）。
+  // 用 700ms 轮询读 timeCursorRef「当前游标」而非 keyed-on-cursor——播放时游标每帧在动、debounce 永不沉降；
+  // 轮询把取数节流到墙钟节奏，游标未动(暂停/静止)时跳过；AbortController 取消在飞请求，断开不报错。
+  // effect 仅在「有/无游标」切换时重挂(deps=[hasTimeCursor])，避免每帧重挂。
+  const hasTimeCursor = typeof timeCursor === 'number';
+  useEffect(() => {
+    if (!hasTimeCursor) return; // 无游标：不取数（地图侧按 intel_items 门控空集，不残留）
+    let ctrl: AbortController | null = null;
+    let lastT: number | null = null;
+    const tick = async () => {
+      const tc = timeCursorRef.current;
+      if (typeof tc !== 'number' || tc === lastT) return; // 游标未动 → 不重取
+      lastT = tc;
+      ctrl?.abort();
+      ctrl = new AbortController();
+      try {
+        const iso = new Date(tc).toISOString();
+        const res = await fetch(
+          `/api/historian/history/events?t=${encodeURIComponent(iso)}&window_h=24&limit=500`,
+          { cache: 'no-store', signal: ctrl.signal },
+        );
+        if (!res.ok) return; // 坏请求/上游问题：保留上次密度，不清空
+        const json = await res.json();
+        setHistoryEvents(Array.isArray(json.events) ? json.events : []);
+      } catch {
+        /* abort / 网络：保留上次密度 */
+      }
+    };
+    tick();
+    const iv = setInterval(tick, 700);
+    return () => {
+      clearInterval(iv);
+      ctrl?.abort();
+    };
+  }, [hasTimeCursor]);
 
   // ── LAYER-AWARE DATA LOADING — only fetch when layer is toggled ON ──
   const layerFetchedRef = useRef<Set<string>>(new Set());
@@ -779,6 +819,7 @@ export default function Dashboard() {
           demoMode={demoMode}
           theme={osirisTheme}
           timeCursor={timeCursor}
+          historyDensity={historyEvents}
         />
       </ErrorBoundary>
 
