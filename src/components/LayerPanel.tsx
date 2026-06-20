@@ -35,7 +35,6 @@ const getLayerGroups = (theme: 'core' | 'ghost') => {
     color: '#1565C0',
     layers: [
       { key: 'sdk_sea', label: '海运航线', icon: Anchor, color: '#4FC3F7', dataKey: 'sdk_entities' },
-      { key: 'sdk_ransomware', label: '勒索软件源', icon: AlertTriangle, color: '#D32F2F', dataKey: 'sdk_entities' },
     ],
   },
   {
@@ -156,13 +155,7 @@ function LayerPanel({ data, activeLayers, setActiveLayers, isMobile, theme = 'co
                 return (
                   <button
                     key={layer.key}
-                    onClick={() => {
-                      if (layer.key === 'sdk_ransomware') {
-                        alert('勒索软件源 — 即将推出');
-                      } else {
-                        toggle(layer.key);
-                      }
-                    }}
+                    onClick={() => toggle(layer.key)}
                     className={`flex items-center gap-2 px-2 py-2 rounded border transition-colors ${
                       isLayerActive 
                         ? 'bg-white/10 border-white/20' 
@@ -291,13 +284,7 @@ function LayerPanel({ data, activeLayers, setActiveLayers, isMobile, theme = 'co
                         return (
                           <button
                             key={layer.key}
-                            onClick={() => {
-                              if (layer.key === 'sdk_ransomware') {
-                                alert('勒索软件源 — 即将推出');
-                              } else {
-                                toggle(layer.key);
-                              }
-                            }}
+                            onClick={() => toggle(layer.key)}
                             className="w-full flex items-center gap-3 px-2 py-1.5 rounded bg-transparent hover:bg-white/5 transition-colors group"
                           >
                             <div 
