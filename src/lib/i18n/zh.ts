@@ -20,6 +20,47 @@ export const zh = {
     scoreLabel: '评分',
     riskFallback: '基于全球威胁数据的风险评估',
   },
+  // 主页面（app/page.tsx）顶栏 / 地图控件 / 直播浮层文案
+  page: {
+    uptime: '运行时长',
+    sys: '系统',
+    solar: '太阳活动',
+    sources: '数据源',
+    support: '支持项目',
+    tagline:
+      '由 OSIRIS 开源情报驱动 · C2 引擎：实体指挥核心 · 传感器：轨道格网 · 网络：莱肯网络',
+    switchTo2d: '切换到 2D 地图',
+    switchTo3d: '切换到 3D 地球',
+    map2d: '2D 地图',
+    map3d: '3D 地球',
+    satelliteView: '卫星视图',
+    nightView: '夜间视图',
+    satellite: '卫星',
+    night: '夜间模式',
+    liveBadge: '实时直播',
+    externalOnly: '仅外部',
+    openOnYoutube: '在 YouTube 打开',
+    closeLiveFeed: '关闭直播',
+    embedRestricted: '嵌入受限',
+    embedRestrictedMsg: '不允许第三方嵌入，请点击下方直接打开直播流。',
+    openLiveStream: '打开直播流',
+    unavailableHintPre: '若显示“视频不可用”，请使用上方的',
+    unavailableHintStrong: '在 YouTube 打开',
+  },
+  // 右侧工具条图标按钮的悬浮标签（此前为纯图标、无文字）
+  toolStrip: {
+    intel: '信号情报 · 侦察',
+    markets: '市场与情报',
+    alerts: '实时告警',
+    entityGraph: '实体关联图',
+    selfTrack: '自我追踪 — 定位你的 IP',
+  },
+  // 枚举显示映射：键 = 后端连接状态原值
+  backendStatus: {
+    connecting: '连接中',
+    connected: '已连接',
+    error: '异常',
+  } as Record<string, string>,
   common: {
     retry: '重试',
     close: '关闭',

@@ -17,6 +17,7 @@ import GlobalStatusBar from '@/components/GlobalStatusBar';
 import LiveAlerts from '@/components/LiveAlerts';
 import ChinesePanels from '@/components/ChinesePanels';
 import TimelineScrubber from '@/components/TimelineScrubber';
+import { t } from '@/lib/i18n';
 
 const OsirisMap = dynamic(() => import('@/components/OsirisMap'), { ssr: false });
 const LayerPanel = dynamic(() => import('@/components/LayerPanel'));
@@ -54,7 +55,7 @@ const UptimeClock = () => {
     }, 1000);
     return () => clearInterval(iv);
   }, []);
-  return <span className="hidden lg:inline">UPTIME: <span className="text-[var(--gold-primary)]">{uptime}</span></span>;
+  return <span className="hidden lg:inline">{t('page.uptime')}: <span className="text-[var(--gold-primary)]">{uptime}</span></span>;
 };
 
 const ZuluClock = () => {
@@ -833,7 +834,7 @@ export default function Dashboard() {
         <button
           onClick={() => setMapProjection(p => p === 'globe' ? 'mercator' : 'globe')}
           className="glass-panel p-3.5 pointer-events-auto hover:border-[var(--gold-primary)]/40 transition-colors group relative"
-          title={mapProjection === 'globe' ? 'Switch to 2D Map' : 'Switch to 3D Globe'}
+          title={mapProjection === 'globe' ? t('page.switchTo2d') : t('page.switchTo3d')}
         >
           {mapProjection === 'globe' ? (
             <MapPinned className="w-5 h-5 text-[var(--gold-primary)] group-hover:scale-110 transition-transform" />
@@ -841,7 +842,7 @@ export default function Dashboard() {
             <Globe className="w-5 h-5 text-[var(--cyan-primary)] group-hover:scale-110 transition-transform" />
           )}
           <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 text-[9px] font-mono text-[var(--text-muted)] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity glass-panel px-2 py-1 z-[300]">
-            {mapProjection === 'globe' ? '2D MAP' : '3D GLOBE'}
+            {mapProjection === 'globe' ? t('page.map2d') : t('page.map3d')}
           </span>
         </button>
 
@@ -849,7 +850,7 @@ export default function Dashboard() {
         <button
           onClick={() => setMapStyle(s => s === 'dark' ? 'satellite' : 'dark')}
           className="glass-panel p-3.5 pointer-events-auto hover:border-[var(--gold-primary)]/40 transition-colors group relative"
-          title={mapStyle === 'dark' ? '卫星视图' : '夜间视图'}
+          title={mapStyle === 'dark' ? t('page.satelliteView') : t('page.nightView')}
         >
           {mapStyle === 'dark' ? (
             <Satellite className="w-5 h-5 text-[var(--alert-green)] group-hover:scale-110 transition-transform" />
@@ -857,7 +858,7 @@ export default function Dashboard() {
             <Moon className="w-5 h-5 text-[var(--cyan-primary)] group-hover:scale-110 transition-transform" />
           )}
           <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 text-[9px] font-mono text-[var(--text-muted)] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity glass-panel px-2 py-1 z-[300]">
-            {mapStyle === 'dark' ? '卫星' : '夜间模式'}
+            {mapStyle === 'dark' ? t('page.satellite') : t('page.night')}
           </span>
         </button>
 
@@ -870,8 +871,8 @@ export default function Dashboard() {
           <span className="text-[10px] text-[var(--text-muted)] font-mono tracking-[0.15em] opacity-80">全球情报指挥</span>
         </div>
         <div className="flex items-center gap-4 mt-1">
-          <span className="text-[5px] text-[var(--text-muted)] font-mono tracking-[0.3em] uppercase opacity-40">
-            POWERED BY OSIRIS OPEN SOURCE INTELLIGENCE · C2 ENGINE: PHYSICAL COMMAND CORE · SENSORS: ORBITAL LATTICE · NET: LYCAN NETWORK
+          <span className="text-[5px] text-[var(--text-muted)] font-mono tracking-[0.3em] opacity-40">
+            {t('page.tagline')}
           </span>
         </div>
       </motion.div>
@@ -883,13 +884,13 @@ export default function Dashboard() {
           <ZuluClock />
         </span>
 
-        <span className="flex items-center gap-1">SYS: <span className={backendStatus === 'connected' ? 'text-[var(--alert-green)]' : 'text-[var(--alert-red)]'}>{backendStatus.toUpperCase()}</span></span>
+        <span className="flex items-center gap-1">{t('page.sys')}: <span className={backendStatus === 'connected' ? 'text-[var(--alert-green)]' : 'text-[var(--alert-red)]'}>{t(`backendStatus.${backendStatus}`, backendStatus.toUpperCase())}</span></span>
 
-        {spaceWeather && <span className="hidden lg:inline">SOLAR: <span style={{ color: spaceWeather.storm_color, fontWeight: 700 }}>Kp{spaceWeather.kp_index}</span></span>}
+        {spaceWeather && <span className="hidden lg:inline">{t('page.solar')}: <span style={{ color: spaceWeather.storm_color, fontWeight: 700 }}>Kp{spaceWeather.kp_index}</span></span>}
 
         <span className="hidden lg:inline-flex items-center gap-1">
           <span className="text-[var(--cyan-primary)] font-bold">{Object.values(activeLayers).filter(Boolean).length}</span>
-          <span className="text-[var(--text-muted)]/60">数据源</span>
+          <span className="text-[var(--text-muted)]/60">{t('page.sources')}</span>
         </span>
 
         <UptimeClock />
@@ -901,7 +902,7 @@ export default function Dashboard() {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.5 }} className="absolute top-3 right-3 z-[200] pointer-events-auto flex items-center gap-2">
           <a href='https://ko-fi.com/M8D41ZYW4Z' target='_blank' className="glass-panel px-2 py-1 flex items-center gap-1.5 text-[7px] font-mono tracking-widest hover:opacity-80 transition-opacity border-[var(--gold-primary)]/40 bg-[var(--gold-primary)]/10">
             <div className="w-1 h-1 rounded-full bg-[var(--gold-primary)] animate-osiris-pulse" />
-            <span className="text-[var(--gold-primary)] font-bold">支持项目</span>
+            <span className="text-[var(--gold-primary)] font-bold">{t('page.support')}</span>
           </a>
         </motion.div>
       )}
@@ -916,9 +917,10 @@ export default function Dashboard() {
       {/* ── RIGHT TOOL STRIP (desktop only — mobile uses bottom nav) ── */}
       {!isMobile && <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-[250] pointer-events-auto bg-black/40 backdrop-blur-sm p-1 rounded-full border border-white/5">
         <div className="relative group">
-          <button onClick={() => { setShowIntel(!showIntel); setShowMarkets(false); setShowAlerts(false); }} className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${showIntel ? 'bg-[var(--cyan-primary)]/20' : 'hover:bg-white/10'}`}>
+          <button onClick={() => { setShowIntel(!showIntel); setShowMarkets(false); setShowAlerts(false); }} title={t('toolStrip.intel')} aria-label={t('toolStrip.intel')} className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${showIntel ? 'bg-[var(--cyan-primary)]/20' : 'hover:bg-white/10'}`}>
             <Radar className={`w-4 h-4 ${showIntel ? 'text-[var(--cyan-primary)]' : 'text-white/60'}`} />
           </button>
+          <span className="absolute right-full mr-2 top-1/2 -translate-y-1/2 text-[9px] font-mono text-[var(--text-muted)] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity glass-panel px-2 py-1 z-[300] pointer-events-none">{t('toolStrip.intel')}</span>
           {/* OSINT / Recon Panel Slideout */}
           <AnimatePresence>
             {showIntel && (
@@ -936,9 +938,10 @@ export default function Dashboard() {
         </div>
 
         <div className="relative group">
-          <button onClick={() => { setShowMarkets(!showMarkets); setShowIntel(false); setShowAlerts(false); }} className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${showMarkets ? 'bg-[var(--gold-primary)]/20' : 'hover:bg-white/10'}`}>
+          <button onClick={() => { setShowMarkets(!showMarkets); setShowIntel(false); setShowAlerts(false); }} title={t('toolStrip.markets')} aria-label={t('toolStrip.markets')} className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${showMarkets ? 'bg-[var(--gold-primary)]/20' : 'hover:bg-white/10'}`}>
             <BarChart3 className={`w-4 h-4 ${showMarkets ? 'text-[var(--gold-primary)]' : 'text-white/60'}`} />
           </button>
+          <span className="absolute right-full mr-2 top-1/2 -translate-y-1/2 text-[9px] font-mono text-[var(--text-muted)] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity glass-panel px-2 py-1 z-[300] pointer-events-none">{t('toolStrip.markets')}</span>
           {/* Markets Panel Slideout */}
           <AnimatePresence>
             {showMarkets && (
@@ -950,9 +953,10 @@ export default function Dashboard() {
         </div>
 
         <div className="relative group">
-          <button onClick={() => { setShowAlerts(!showAlerts); setShowIntel(false); setShowMarkets(false); setShowEntityGraph(false); }} className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${showAlerts ? 'bg-[#FF3D3D]/20' : 'hover:bg-white/10'}`}>
+          <button onClick={() => { setShowAlerts(!showAlerts); setShowIntel(false); setShowMarkets(false); setShowEntityGraph(false); }} title={t('toolStrip.alerts')} aria-label={t('toolStrip.alerts')} className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${showAlerts ? 'bg-[#FF3D3D]/20' : 'hover:bg-white/10'}`}>
             <AlertTriangle className={`w-4 h-4 ${showAlerts ? 'text-[#FF3D3D]' : 'text-white/60'}`} />
           </button>
+          <span className="absolute right-full mr-2 top-1/2 -translate-y-1/2 text-[9px] font-mono text-[var(--text-muted)] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity glass-panel px-2 py-1 z-[300] pointer-events-none">{t('toolStrip.alerts')}</span>
           {/* Alerts Panel Slideout */}
           <AnimatePresence>
             {showAlerts && (
@@ -964,9 +968,10 @@ export default function Dashboard() {
         </div>
 
         <div className="relative group">
-          <button onClick={() => { setShowEntityGraph(!showEntityGraph); setShowIntel(false); setShowMarkets(false); setShowAlerts(false); }} className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${showEntityGraph ? 'bg-[#D4AF37]/20' : 'hover:bg-white/10'}`}>
+          <button onClick={() => { setShowEntityGraph(!showEntityGraph); setShowIntel(false); setShowMarkets(false); setShowAlerts(false); }} title={t('toolStrip.entityGraph')} aria-label={t('toolStrip.entityGraph')} className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${showEntityGraph ? 'bg-[#D4AF37]/20' : 'hover:bg-white/10'}`}>
             <Network className={`w-4 h-4 ${showEntityGraph ? 'text-[#D4AF37]' : 'text-white/60'}`} />
           </button>
+          <span className="absolute right-full mr-2 top-1/2 -translate-y-1/2 text-[9px] font-mono text-[var(--text-muted)] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity glass-panel px-2 py-1 z-[300] pointer-events-none">{t('toolStrip.entityGraph')}</span>
         </div>
 
         {/* ── 中文情报面板组（烽火 Fanos，新增；详见 docs/adr/0007） ── */}
@@ -995,10 +1000,12 @@ export default function Dashboard() {
                 .catch(() => {});
             }}
             className="w-8 h-8 rounded-full flex items-center justify-center transition-colors hover:bg-[#39FF14]/20 group"
-            title="自我追踪 — 定位你的 IP"
+            title={t('toolStrip.selfTrack')}
+            aria-label={t('toolStrip.selfTrack')}
           >
             <Crosshair className="w-4 h-4 text-white/60 group-hover:text-[#39FF14] transition-colors" />
           </button>
+          <span className="absolute right-full mr-2 top-1/2 -translate-y-1/2 text-[9px] font-mono text-[var(--text-muted)] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity glass-panel px-2 py-1 z-[300] pointer-events-none">{t('toolStrip.selfTrack')}</span>
         </div>
       </div>}
 
@@ -1023,9 +1030,9 @@ export default function Dashboard() {
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-[#FF4081] animate-osiris-pulse" />
                   <span className="text-[12px] font-mono font-bold text-white tracking-wider">{liveFeedName}</span>
-                  <span className="px-1.5 py-0.5 rounded bg-red-500/20 text-red-400 font-mono text-[9px] font-bold">实时直播</span>
+                  <span className="px-1.5 py-0.5 rounded bg-red-500/20 text-red-400 font-mono text-[9px] font-bold">{t('page.liveBadge')}</span>
                   {!liveFeedEmbedAllowed && (
-                    <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 font-mono text-[9px]">仅外部</span>
+                    <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 font-mono text-[9px]">{t('page.externalOnly')}</span>
                   )}
                 </div>
                 <div className="flex items-center gap-3">
@@ -1035,10 +1042,10 @@ export default function Dashboard() {
                     rel="noopener noreferrer"
                     className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[var(--border-primary)] hover:bg-[var(--gold-primary)] hover:text-black text-white transition-colors text-[11px] font-mono"
                   >
-                    <span>在 YouTube 打开</span>
+                    <span>{t('page.openOnYoutube')}</span>
                     <ExternalLink className="w-3 h-3" />
                   </a>
-                  <button onClick={() => setLiveFeedUrl(null)} className="text-white/70 hover:text-white transition-colors p-1">
+                  <button onClick={() => setLiveFeedUrl(null)} title={t('page.closeLiveFeed')} aria-label={t('page.closeLiveFeed')} className="text-white/70 hover:text-white transition-colors p-1">
                     <X className="w-5 h-5" />
                   </button>
                 </div>
@@ -1060,9 +1067,9 @@ export default function Dashboard() {
                     <div className="w-14 h-14 rounded-full bg-[#39FF14]/10 border border-[#39FF14]/20 flex items-center justify-center mx-auto mb-4">
                       <ExternalLink className="w-6 h-6 text-[#39FF14]" />
                     </div>
-                    <p className="text-[13px] font-mono font-bold text-white tracking-widest mb-2">嵌入受限</p>
+                    <p className="text-[13px] font-mono font-bold text-white tracking-widest mb-2">{t('page.embedRestricted')}</p>
                     <p className="text-[11px] font-mono text-white/50 mb-6 max-w-xs">
-                      {liveFeedName} does not allow third-party embedding. Click below to open the live stream directly.
+                      {t('page.embedRestrictedMsg')}
                     </p>
                     <a
                       href={getYouTubeWatchUrl(liveFeedUrl)}
@@ -1071,7 +1078,7 @@ export default function Dashboard() {
                       className="inline-flex items-center gap-2 px-6 py-2.5 rounded border border-[#39FF14]/40 text-[#39FF14] font-mono text-[12px] hover:bg-[#39FF14]/10 transition-colors tracking-wider"
                     >
                       <ExternalLink className="w-4 h-4" />
-                      OPEN LIVE STREAM
+                      {t('page.openLiveStream')}
                     </a>
                   </div>
                 </div>
@@ -1082,7 +1089,7 @@ export default function Dashboard() {
                 <div className="bg-[#111]/90 px-4 py-2.5 border-t border-[var(--border-primary)] flex items-center gap-2.5">
                   <AlertTriangle className="w-4 h-4 text-[var(--gold-primary)] shrink-0" />
                   <span className="text-[11px] font-mono text-white/70 leading-relaxed">
-                    若显示&ldquo;视频不可用&rdquo;，请使用上方的 <strong className="text-[var(--gold-primary)]">在 YouTube 打开</strong>。
+                    {t('page.unavailableHintPre')} <strong className="text-[var(--gold-primary)]">{t('page.unavailableHintStrong')}</strong>。
                   </span>
                 </div>
               )}
