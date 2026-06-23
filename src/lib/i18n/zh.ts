@@ -204,6 +204,32 @@ export const zh = {
     ELEVATED: '中等风险——政治不稳定或地区争端',
     LOW: '稳定——未检测到重大威胁',
   } as Record<string, string>,
+  // 图层面板（LayerPanel.tsx）：组短标签 / 组全名 / 各层名 / 主题开关
+  layers: {
+    group: {
+      aviation: '航空', maritime: '海事', surveillance: '监控',
+      disaster: '灾害', threat: '威胁', cyber: '网络', display: '显示',
+    },
+    full: {
+      sdk: '烽火 SDK', aviation: '航空', maritime: '海事与太空', surveillance: '监控',
+      disaster: '自然灾害', threat: '威胁与基础设施', cyber: '网络情报', display: '显示',
+    },
+    item: {
+      sdk_sea: '海运航线', flights: '商用航班', private: '私人航班', jets: '私人喷气机',
+      military: '军用航班', maritime: '海事 / 海军', satellites: '卫星', cctv: '监控摄像头',
+      live_news: '实时新闻源', earthquakes: '地震（24小时）', fires: '活跃火点',
+      weather: '恶劣天气', infrastructure: '核设施', global_incidents: '全球事件',
+      gps_jamming: 'GPS 干扰', malware: '实时恶意软件', day_night: '昼夜循环',
+    },
+    ghostMode: '幽灵模式',
+    ghostProtocol: '幽灵协议',
+  },
+  // 行情面板（MarketsPanel.tsx）板块标签
+  markets: {
+    section: {
+      indices: '指数', stocks: '国防', oil: '能源', commodities: '大宗商品', crypto: '加密货币',
+    },
+  },
 } as const;
 
 export type Zh = typeof zh;

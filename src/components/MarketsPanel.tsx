@@ -12,11 +12,11 @@ import { t } from '@/lib/i18n';
 interface MarketsPanelProps { data: any; spaceWeather?: any; }
 
 const SECTIONS = [
-  { key: 'indices', label: '指数', icon: LineChart },
-  { key: 'stocks', label: '国防', icon: Shield },
-  { key: 'oil', label: '能源', icon: Droplets },
-  { key: 'commodities', label: '大宗商品', icon: Gem },
-  { key: 'crypto', label: '加密货币', icon: Bitcoin },
+  { key: 'indices', label: t('markets.section.indices'), icon: LineChart },
+  { key: 'stocks', label: t('markets.section.stocks'), icon: Shield },
+  { key: 'oil', label: t('markets.section.oil'), icon: Droplets },
+  { key: 'commodities', label: t('markets.section.commodities'), icon: Gem },
+  { key: 'crypto', label: t('markets.section.crypto'), icon: Bitcoin },
 ];
 
 function Ticker({ name, data: d }: { name: string; data: any }) {

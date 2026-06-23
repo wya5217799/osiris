@@ -7,6 +7,7 @@ import {
   CloudLightning, Radiation, Tv, Anchor, Ship, Newspaper,
   Network, Share2, Radio
 } from 'lucide-react';
+import { t } from '@/lib/i18n';
 
 interface LayerPanelProps {
   data: any;
@@ -31,76 +32,76 @@ const getLayerGroups = (theme: 'core' | 'ghost') => {
   return [
   {
     label: 'SDK',
-    fullLabel: '烽火 SDK',
+    fullLabel: t('layers.full.sdk'),
     color: '#1565C0',
     layers: [
-      { key: 'sdk_sea', label: '海运航线', icon: Anchor, color: '#4FC3F7', dataKey: 'sdk_entities' },
+      { key: 'sdk_sea', label: t('layers.item.sdk_sea'), icon: Anchor, color: '#4FC3F7', dataKey: 'sdk_entities' },
     ],
   },
   {
-    label: '航空',
-    fullLabel: '航空',
+    label: t('layers.group.aviation'),
+    fullLabel: t('layers.full.aviation'),
     color: flightCom,
     layers: [
-      { key: 'flights', label: '商用航班', icon: Plane, color: flightCom, dataKey: 'commercial_flights' },
-      { key: 'private', label: '私人航班', icon: Plane, color: flightPriv, dataKey: 'private_flights' },
-      { key: 'jets', label: '私人喷气机', icon: Plane, color: flightGov, dataKey: 'private_jets' },
-      { key: 'military', label: '军用航班', icon: Shield, color: flightMil, dataKey: 'military_flights' },
+      { key: 'flights', label: t('layers.item.flights'), icon: Plane, color: flightCom, dataKey: 'commercial_flights' },
+      { key: 'private', label: t('layers.item.private'), icon: Plane, color: flightPriv, dataKey: 'private_flights' },
+      { key: 'jets', label: t('layers.item.jets'), icon: Plane, color: flightGov, dataKey: 'private_jets' },
+      { key: 'military', label: t('layers.item.military'), icon: Shield, color: flightMil, dataKey: 'military_flights' },
     ],
   },
   {
-    label: '海事',
-    fullLabel: '海事与太空',
+    label: t('layers.group.maritime'),
+    fullLabel: t('layers.full.maritime'),
     color: '#26C6DA',
     layers: [
-      { key: 'maritime', label: '海事 / 海军', icon: Ship, color: '#26C6DA', dataKey: 'maritime_ships,maritime_ports,maritime_chokepoints' },
-      { key: 'satellites', label: '卫星', icon: Satellite, color: '#D4AF37', dataKey: 'satellites' },
+      { key: 'maritime', label: t('layers.item.maritime'), icon: Ship, color: '#26C6DA', dataKey: 'maritime_ships,maritime_ports,maritime_chokepoints' },
+      { key: 'satellites', label: t('layers.item.satellites'), icon: Satellite, color: '#D4AF37', dataKey: 'satellites' },
     ],
   },
   {
-    label: '监控',
-    fullLabel: '监控',
+    label: t('layers.group.surveillance'),
+    fullLabel: t('layers.full.surveillance'),
     color: '#7E57C2',
     layers: [
-      { key: 'cctv', label: '监控摄像头', icon: Camera, color: '#7E57C2', dataKey: 'cameras' },
-      { key: 'live_news', label: '实时新闻源', icon: Tv, color: '#EC407A', dataKey: 'live_feeds' },
+      { key: 'cctv', label: t('layers.item.cctv'), icon: Camera, color: '#7E57C2', dataKey: 'cameras' },
+      { key: 'live_news', label: t('layers.item.live_news'), icon: Tv, color: '#EC407A', dataKey: 'live_feeds' },
     ],
   },
   {
-    label: '灾害',
-    fullLabel: '自然灾害',
+    label: t('layers.group.disaster'),
+    fullLabel: t('layers.full.disaster'),
     color: '#F9A825',
     layers: [
-      { key: 'earthquakes', label: '地震（24小时）', icon: Activity, color: '#F9A825', dataKey: 'earthquakes' },
-      { key: 'fires', label: '活跃火点', icon: Flame, color: '#E65100', dataKey: 'fires' },
-      { key: 'weather', label: '恶劣天气', icon: CloudLightning, color: '#7E57C2', dataKey: 'weather_events' },
+      { key: 'earthquakes', label: t('layers.item.earthquakes'), icon: Activity, color: '#F9A825', dataKey: 'earthquakes' },
+      { key: 'fires', label: t('layers.item.fires'), icon: Flame, color: '#E65100', dataKey: 'fires' },
+      { key: 'weather', label: t('layers.item.weather'), icon: CloudLightning, color: '#7E57C2', dataKey: 'weather_events' },
     ],
   },
   {
-    label: '威胁',
-    fullLabel: '威胁与基础设施',
+    label: t('layers.group.threat'),
+    fullLabel: t('layers.full.threat'),
     color: '#D32F2F',
     layers: [
-      { key: 'infrastructure', label: '核设施', icon: Radiation, color: '#26A69A', dataKey: 'infrastructure' },
-      { key: 'global_incidents', label: '全球事件', icon: AlertTriangle, color: '#D32F2F', dataKey: 'gdelt' },
-      { key: 'gps_jamming', label: 'GPS 干扰', icon: Radio, color: '#D32F2F', dataKey: 'gps_jamming' },
+      { key: 'infrastructure', label: t('layers.item.infrastructure'), icon: Radiation, color: '#26A69A', dataKey: 'infrastructure' },
+      { key: 'global_incidents', label: t('layers.item.global_incidents'), icon: AlertTriangle, color: '#D32F2F', dataKey: 'gdelt' },
+      { key: 'gps_jamming', label: t('layers.item.gps_jamming'), icon: Radio, color: '#D32F2F', dataKey: 'gps_jamming' },
     ],
   },
   {
-    label: '网络',
-    fullLabel: '网络情报',
+    label: t('layers.group.cyber'),
+    fullLabel: t('layers.full.cyber'),
     color: '#D32F2F',
     layers: [
 
-      { key: 'malware', label: '实时恶意软件', icon: AlertTriangle, color: '#D32F2F', dataKey: 'malware_threats' },
+      { key: 'malware', label: t('layers.item.malware'), icon: AlertTriangle, color: '#D32F2F', dataKey: 'malware_threats' },
     ],
   },
   {
-    label: '显示',
-    fullLabel: '显示',
+    label: t('layers.group.display'),
+    fullLabel: t('layers.full.display'),
     color: '#448AFF',
     layers: [
-      { key: 'day_night', label: '昼夜循环', icon: Sun, color: '#448AFF', dataKey: '' },
+      { key: 'day_night', label: t('layers.item.day_night'), icon: Sun, color: '#448AFF', dataKey: '' },
     ],
   },
   ];
@@ -187,7 +188,7 @@ function LayerPanel({ data, activeLayers, setActiveLayers, isMobile, theme = 'co
         {setTheme && (
           <div className="flex items-center justify-between mt-4 pt-4 border-t border-[var(--border-primary)] px-2">
             <div className="text-[10px] font-bold font-mono tracking-widest text-[var(--text-secondary)]">
-              幽灵模式
+              {t('layers.ghostMode')}
             </div>
             <button
               onClick={() => setTheme(theme === 'core' ? 'ghost' : 'core')}
@@ -314,7 +315,7 @@ function LayerPanel({ data, activeLayers, setActiveLayers, isMobile, theme = 'co
       {/* DESKTOP THEME TOGGLE */}
       {setTheme && (
         <div className="mt-auto px-2 pt-6 pb-2 border-t border-[var(--border-primary)] flex flex-col items-center gap-3 relative z-50">
-          <div className="text-[9px] font-mono tracking-[0.25em] text-[var(--text-secondary)]">幽灵协议</div>
+          <div className="text-[9px] font-mono tracking-[0.25em] text-[var(--text-secondary)]">{t('layers.ghostProtocol')}</div>
           <button
             onClick={() => setTheme(theme === 'core' ? 'ghost' : 'core')}
             className="relative w-14 h-7 rounded-full transition-all duration-500 ease-in-out border flex items-center px-1 cursor-pointer hover:shadow-lg"
