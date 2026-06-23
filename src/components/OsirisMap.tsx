@@ -21,6 +21,7 @@ interface OsirisMapProps {
   theme?: 'core' | 'ghost';
   timeCursor?: number; // M6 时间轴游标（epoch ms）；仅显示 time_window 含此刻的情报条目
   historyDensity?: Array<{ lat: number; lng: number; count: number; avg_sev: number | null }>; // M6 游标时刻 geo-event 按 h3 格密度
+  entityDensity?: Array<{ lat: number; lng: number; count: number }>; // M6 游标时刻移动实体（航空/卫星/船舶）按 h3 格密度
 }
 
 function computeSolarTerminator(): [number, number][] {
@@ -45,7 +46,7 @@ function computeSolarTerminator(): [number, number][] {
 
 const EMPTY_FC = { type: 'FeatureCollection' as const, features: [] };
 
-function OsirisMap({ data, activeLayers, onEntityClick, onMouseCoords, onRightClick, onViewStateChange, flyToLocation, projection = 'globe', mapStyle = 'dark', sweepData, scanTargets = [], demoMode = false, theme = 'core', timeCursor, historyDensity }: OsirisMapProps) {
+function OsirisMap({ data, activeLayers, onEntityClick, onMouseCoords, onRightClick, onViewStateChange, flyToLocation, projection = 'globe', mapStyle = 'dark', sweepData, scanTargets = [], demoMode = false, theme = 'core', timeCursor, historyDensity, entityDensity }: OsirisMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const popupRef = useRef<maplibregl.Popup | null>(null);
@@ -203,7 +204,7 @@ function OsirisMap({ data, activeLayers, onEntityClick, onMouseCoords, onRightCl
       createDot(map, 'dot-fire', isGhost ? phantomPurple : '#E65100', 10);
       createDot(map, 'dot-cctv', cameraColor, 10);
 
-      const sources = ['flights','military','jets','private-fl','satellites','earthquakes','gdelt','gps-jamming','day-night','cctv','fires','weather','infrastructure','maritime','maritime-choke','maritime-ships','live-news','sigint-news','conflict-zones', 'war-alerts-targets', 'war-alerts-lines', 'balloons', 'radiation', 'ip-sweep-devices', 'ip-sweep-pulse', 'ip-sweep-connections', 'scan-targets', 'sdk-entities', 'sdk-links', 'malware-nodes', 'network-mesh', 'intel-items', 'history-density'];
+      const sources = ['flights','military','jets','private-fl','satellites','earthquakes','gdelt','gps-jamming','day-night','cctv','fires','weather','infrastructure','maritime','maritime-choke','maritime-ships','live-news','sigint-news','conflict-zones', 'war-alerts-targets', 'war-alerts-lines', 'balloons', 'radiation', 'ip-sweep-devices', 'ip-sweep-pulse', 'ip-sweep-connections', 'scan-targets', 'sdk-entities', 'sdk-links', 'malware-nodes', 'network-mesh', 'intel-items', 'history-density', 'entity-density'];
       sources.forEach(s => map.addSource(s, { type: 'geojson', data: EMPTY_FC }));
 
       // Warning icon generator (parameterized — eliminates 3x copy-paste)
@@ -306,6 +307,14 @@ function OsirisMap({ data, activeLayers, onEntityClick, onMouseCoords, onRightCl
         'circle-radius': ['interpolate', ['linear'], ['get', 'count'], 1, 3, 10, 9, 50, 17, 200, 30],
         'circle-color': ['interpolate', ['linear'], ['coalesce', ['get', 'avg_sev'], 1], 1, '#26A69A', 3, '#F9A825', 5, '#D32F2F'],
         'circle-opacity': 0.22, 'circle-blur': 0.85,
+      }});
+
+      // ══ 烽火 Fanos — M6 移动实体密度（航空/卫星/船舶 h3 密度；蓝色，区别于 geo 事件的青-金-红）══
+      // entity_positions 体量最大（~1.6M/48h）；蓝色软斑让回放呈现「多源态势」。count 量级高 → 半径断点更高。
+      map.addLayer({ id: 'entity-density-heat', type: 'circle', source: 'entity-density', paint: {
+        'circle-radius': ['interpolate', ['linear'], ['get', 'count'], 1, 2, 50, 8, 500, 16, 5000, 26],
+        'circle-color': '#42A5F5',
+        'circle-opacity': 0.18, 'circle-blur': 0.85,
       }});
 
       // ══ 烽火 Fanos — 融合情报条目（intel items，金色；M6 时间轴回放层）══
@@ -1383,6 +1392,20 @@ function OsirisMap({ data, activeLayers, onEntityClick, onMouseCoords, onRightCl
         properties: { count: c.count ?? 0, avg_sev: c.avg_sev ?? null },
       })));
   }, [mapReady, historyDensity, activeLayers.intel_items, setGeo]);
+
+  // M6 时间轴密度叠加：游标时刻的移动实体（航空/卫星/船舶）按 h3 格密度 → GeoJSON（count 控半径）。
+  // 与 geo 密度同样随 intel_items 门控；让回放是多源态势（geo 事件 + 移动实体）而非单源。
+  useEffect(() => {
+    if (!mapReady) return;
+    const cells = (activeLayers.intel_items && Array.isArray(entityDensity)) ? entityDensity : [];
+    setGeo('entity-density', cells
+      .filter((c) => typeof c.lat === 'number' && typeof c.lng === 'number')
+      .map((c) => ({
+        type: 'Feature' as const,
+        geometry: { type: 'Point' as const, coordinates: [c.lng, c.lat] },
+        properties: { count: c.count ?? 0 },
+      })));
+  }, [mapReady, entityDensity, activeLayers.intel_items, setGeo]);
 
   // M6 时间轴：游标过滤——只显示 time_window 含游标的情报条目（undefined 时清过滤，全显）
   useEffect(() => {

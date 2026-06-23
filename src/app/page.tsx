@@ -121,6 +121,9 @@ export default function Dashboard() {
   const [timeCursor, setTimeCursor] = useState<number | undefined>(undefined); // M6 时间轴游标（epoch ms）
   // M6 时间轴密度叠加：游标时刻的 geo-event 密度（historian /history/events，CAGG 速度层）
   const [historyEvents, setHistoryEvents] = useState<Array<{ lat: number; lng: number; count: number; avg_sev: number | null }>>([]);
+  // M6 时间轴密度叠加：游标时刻的移动实体密度（航空/卫星/船舶；/history/entities，entity_positions_5min CAGG）
+  // 让回放是「多源态势」而非单源——entity_positions 是体量最大的数据源，之前后端就绪但前端从未调用。
+  const [historyEntities, setHistoryEntities] = useState<Array<{ lat: number; lng: number; count: number }>>([]);
   const timeCursorRef = useRef<number | undefined>(undefined);
   timeCursorRef.current = timeCursor; // 最新游标 ref：供轮询读「当前」值而不把 effect 钉在每帧变化的 timeCursor 上
 
@@ -385,15 +388,29 @@ export default function Dashboard() {
       lastT = tc;
       ctrl?.abort();
       ctrl = new AbortController();
-      try {
-        const iso = new Date(tc).toISOString();
+      const iso = new Date(tc).toISOString();
+      const sig = ctrl.signal;
+      try { // geo-event 密度
         const res = await fetch(
           `/api/historian/history/events?t=${encodeURIComponent(iso)}&window_h=24&limit=500`,
-          { cache: 'no-store', signal: ctrl.signal },
+          { cache: 'no-store', signal: sig },
         );
-        if (!res.ok) return; // 坏请求/上游问题：保留上次密度，不清空
-        const json = await res.json();
-        setHistoryEvents(Array.isArray(json.events) ? json.events : []);
+        if (res.ok) { // 坏请求/上游问题：保留上次密度，不清空
+          const json = await res.json();
+          setHistoryEvents(Array.isArray(json.events) ? json.events : []);
+        }
+      } catch {
+        /* abort / 网络：保留上次密度 */
+      }
+      try { // 移动实体密度（独立于 geo 事件失败：一个坏了另一个仍刷）
+        const res = await fetch(
+          `/api/historian/history/entities?t=${encodeURIComponent(iso)}&window_m=60&limit=1000`,
+          { cache: 'no-store', signal: sig },
+        );
+        if (res.ok) {
+          const json = await res.json();
+          setHistoryEntities(Array.isArray(json.entities) ? json.entities : []);
+        }
       } catch {
         /* abort / 网络：保留上次密度 */
       }
@@ -821,6 +838,7 @@ export default function Dashboard() {
           theme={osirisTheme}
           timeCursor={timeCursor}
           historyDensity={historyEvents}
+          entityDensity={historyEntities}
         />
       </ErrorBoundary>
 
